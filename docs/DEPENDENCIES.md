@@ -19,7 +19,7 @@ Terraform in this repo **does not** create Key Vault; manage the vault separatel
 | **Azure CLI** (`az`) | `az login`, Key Vault secret reads for Ansible, optional vault administration. |
 | **Terraform** ≥ 1.2 | Provisions Azure compute and network. |
 | **Ansible** ≥ 2.14 | `ansible-playbook`, roles, collections. |
-| **`ansible-galaxy collection install -r ansible/requirements.yml`** | Installs **`community.general`** (UFW, etc.) and **`azure.azcollection`** (optional Azure modules; Key Vault reads use `az` only). |
+| **`ansible-galaxy collection install -r ansible/requirements.yml`** | Installs **`ansible.posix`** (sysctl, etc.), **`community.general`** (UFW), and **`azure.azcollection`** (optional Azure modules; Key Vault reads use `az` only). |
 | **SSH client** + key to the VM | Ansible connects to `azure_vm` inventory; agent forwarding is enabled in `ansible.cfg` for **git** clone of `docker_stacks_repo_url` on the VM. |
 | **Git** | Clone this repo locally; the VM clones the same repo URL from `homelab_public.yml`. |
 

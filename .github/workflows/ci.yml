@@ -55,12 +55,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Ansible and collections
-        run: |
-          pip install --user "ansible-core>=2.14"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          cd ansible && ansible-galaxy collection install -r requirements.yml
-
-      - name: Syntax check deploy-homelab
+      # Use pip's ansible-core for both galaxy and playbook. Prepend ~/.local/bin so we do not
+      # pick up a different ansible-playbook from PATH (which would not see collections installed
+      # by this job's ansible-galaxy).
+      - name: Install Ansible, Galaxy collections, syntax-check
         working-directory: ansible
-        run: ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i ../.github/inventory-syntax.ini playbooks/deploy-homelab.yml --syntax-check
+        run: |
+          set -euo pipefail
+          pip install --user "ansible-core>=2.14"
+          export PATH="${HOME}/.local/bin:${PATH}"
+          ansible-galaxy collection install -r requirements.yml
+          ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i ../.github/inventory-syntax.ini playbooks/deploy-homelab.yml --syntax-check
