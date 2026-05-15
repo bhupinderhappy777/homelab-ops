@@ -88,16 +88,9 @@ duplicate-object errors and broken foreign-key ordering.
 MariaDB dumps include `DROP TABLE IF EXISTS`, so they are safer to replay into
 an existing database, though restoring into a fresh database is still cleaner.
 
-## Verified Local Restore Results
+## Restore drills
 
-The April 2026 migration dumps were restored locally with Podman:
-
-- Docuseal: `1` user, `18` templates, `30` submissions, `401` storage blobs;
-  endpoint returned `200 OK`.
-- Paperless: `3` users, `92` documents; container healthy.
-- Firefly: `1` user, `850` transactions; app healthy.
-- Immich: `3095` assets; endpoint returned `200 OK`.
-- Monica: dump restored, but expected to be empty.
+Periodically restore onto a clean VM or alternate data directory using `backup_restore_snapshot` and the checklist earlier in this document. Validate row counts, HTTP health, and application-specific smoke tests after each drill.
 
 ## Runtime Notes
 

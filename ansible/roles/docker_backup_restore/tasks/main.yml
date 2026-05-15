@@ -1,11 +1,4 @@
 ---
-- name: Fail when both migration restore modes are requested
-  ansible.builtin.fail:
-    msg: "Set either migration_restore_archive_dir or backup_restore_snapshot, not both."
-  when:
-    - backup_restore_snapshot | length > 0
-    - migration_restore_archive_dir | default('') | length > 0
-
 - name: Ensure restic restore script is installed on host
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../../docker/scripts/restore.sh"

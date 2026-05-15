@@ -12,7 +12,7 @@ Ansible is responsible for:
 - installing and configuring `cloudflared`
 - deploying Compose stacks
 - configuring nightly OCI backup cron
-- optional restore from OCI or one-time migration import
+- optional **restic restore from OCI** when you pass `backup_restore_snapshot`
 
 ## Prerequisites
 
@@ -68,7 +68,7 @@ From `ansible/` so `ansible.cfg` is used:
 
 ```bash
 cd ansible
-ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml --skip-tags migration_restore,backup_restore
+ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml --skip-tags backup_restore
 ```
 
 Restore from OCI backup:
@@ -77,14 +77,6 @@ Restore from OCI backup:
 cd ansible
 ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
   -e backup_restore_snapshot=latest
-```
-
-One-time migration import:
-
-```bash
-cd ansible
-ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
-  -e migration_restore_archive_dir=/path/to/export
 ```
 
 With `homelab_container_runtime: "podman"`, the playbook installs Podman, enables `podman.socket`, and uses `podman-compose` for stack deployment. Helper scripts honor `CONTAINER_RUNTIME=podman`.

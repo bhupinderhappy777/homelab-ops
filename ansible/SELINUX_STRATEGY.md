@@ -25,7 +25,7 @@ This ensures:
 1. **Durable labeling**: persists across `restorecon` calls via SELinux policy
 2. **Consistent type**: all paths get `container_file_t` (the standard container data type)
 3. **No MCS pre-assignment**: Podman applies MCS at runtime per mount, not conflicts
-4. **Recovery-safe**: migration data inherits correct labels on restore
+4. **Recovery-safe**: restored or copied host data inherits correct labels on restore
 
 ## Implementation
 
@@ -117,4 +117,4 @@ If containers still show SELinux denials after role runs:
 
 - Automate `audit2allow` module generation for non-standard denial patterns
 - Add per-app SELinux profiles for stricter isolation
-- Integrate with Kubernetes if migration happens (different labeling model)
+- Integrate with Kubernetes if the workload moves to a cluster (different labeling model)

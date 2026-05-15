@@ -26,9 +26,6 @@
     - role: docker_backup_cron
       tags: ['backup']
 
- #   - role: docker_migration_restore
- #     tags: ['migration_restore', 'restore']
-
     - role: docker_backup_restore
       tags: ['backup_restore', 'restore']
 

@@ -92,12 +92,10 @@ excluded.
 
 ### If The Service Has A Database Dump
 
-Update all relevant scripts:
+Update the backup and restore scripts:
 
 - `docker/scripts/backup.sh`
 - `docker/scripts/restore.sh`
-- `docker/scripts/migration-export.sh`
-- `docker/scripts/migration-import.sh`
 
 Add:
 

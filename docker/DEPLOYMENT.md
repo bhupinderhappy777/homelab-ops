@@ -37,49 +37,27 @@ Use the canonical steps in **[docs/README.md](../docs/README.md)** (Key Vault in
 
 The deploy-time env file on the VM is rendered at `/opt/homelab/docker_stacks/docker/.env` from [ansible/roles/docker_stacks_deploy/templates/homelab.env.j2](../ansible/roles/docker_stacks_deploy/templates/homelab.env.j2).
 
-## 4. Choose Deployment Mode
+## 4. Choose deployment mode
 
-There are three normal modes:
+1. **Clean host, no OCI restore on this run:** run the playbook with `--skip-tags backup_restore` (typical redeploy when data already exists on disk).
+2. **Clean host, restore from OCI:** run the playbook with `-e backup_restore_snapshot=latest`, or pass a specific restic snapshot id instead of `latest`.
 
-1. Clean host, no data restore: run the playbook normally.
-2. Clean host, restore from OCI backup: run the playbook with `-e backup_restore_snapshot=latest`.
-3. One-time migration from an old host export: run the playbook with `-e migration_restore_archive_dir=/path/to/export`.
+Create these host paths before deploy if your stacks use them:
 
-## 5. Legacy Migration Data
+- `/mnt/media` — Immich read-only media imports
+- `/mnt/media_storage` — Jellyfin extra media
+- `/opt/homelab/media` — shared media/downloads for Jellyfin and n8n
 
-If you are doing a one-time migration from the old Swarm layout, copy the old data from `/home/adminuser/docker-data/...` into the new `/opt/homelab/data/...` paths before starting the stacks.
+## 5. Run the Playbook
 
-Examples:
-
-```text
-/home/adminuser/docker-data/openwebui_data            -> /opt/homelab/data/openwebui_data
-/home/adminuser/docker-data/paperless_ngx            -> /opt/homelab/data/paperless_ngx
-/home/adminuser/docker-data/firefly_iii              -> /opt/homelab/data/firefly_iii
-/home/adminuser/docker-data/immich                   -> /opt/homelab/data/immich
-/home/adminuser/docker-data/obsidian                 -> /opt/homelab/data/obsidian
-/home/adminuser/docker-data/pihole_data              -> /opt/homelab/data/pihole_data
-/home/adminuser/docker-data/jellyfin_data            -> /opt/homelab/data/jellyfin_data
-/home/adminuser/docker-data/prometheus               -> /opt/homelab/data/prometheus
-/home/adminuser/docker-data/grafana                  -> /opt/homelab/data/grafana
-/home/adminuser/docker-data/loki                     -> /opt/homelab/data/loki
-```
-
-Also ensure these host paths still exist if you use them:
-
-- `/mnt/media` for Immich read-only media imports
-- `/mnt/media_storage` for Jellyfin extra media
-- `/opt/homelab/media` for the shared media/downloads bind mount used by Jellyfin and n8n
-
-## 6. Run the Playbook
-
-Clean host deployment:
+**Steady-state deploy** (no restic restore this run):
 
 ```bash
 cd ansible
-ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml --skip-tags migration_restore,backup_restore
+ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml --skip-tags backup_restore
 ```
 
-Restore from OCI backup on first deploy:
+**First boot or DR: restore from OCI** (requires Key Vault secrets for restic and DB access):
 
 ```bash
 cd ansible
@@ -119,14 +97,14 @@ Make sure only the intended production host is running the production tunnel tok
 4. `docker_directories`: creates the exact bind-mount directories expected by the compose files under `/opt/homelab`.
 5. `docker_stacks_deploy`: clones this repo to `/opt/homelab/docker_stacks`, renders `/opt/homelab/docker/.env`, and deploys the compose stacks.
 6. `docker_backup_cron`: installs the OCI/restic backup and restore scripts, renders `/etc/homelab/restic.env`, and schedules nightly backups.
-7. `docker_migration_restore`: one-time migration import (optional; currently commented out in [deploy-homelab.yml](../ansible/playbooks/deploy-homelab.yml) — enable the role if you use it).
-8. `docker_backup_restore`: optionally restores from an OCI restic snapshot.
-9. `cloudflared`: installs the Cloudflare Tunnel binary and starts the systemd service with the provided token.
+7. `docker_backup_restore`: optionally restores from an OCI restic snapshot (`-e backup_restore_snapshot=...`).
+8. `cloudflared`: installs the Cloudflare Tunnel binary and starts the systemd service with the provided token.
+9. `tailscale`: installs and enrolls Tailscale when `vault_tailscale_auth_key` is set in Key Vault.
 
-## Will It Work If You Just Move Data and Run Ansible?
+## Will It Work If You Copy Data and Run Ansible?
 Usually yes, but only if all of the following are true:
 
-1. Your migrated data lands in the exact new bind-mount paths under `/opt/homelab/data`.
+1. Application data lives under the expected bind-mount paths under `/opt/homelab/data` (for example after a successful restic restore, or manual copy into those paths).
 2. All required secrets exist in Azure Key Vault (see `ansible/roles/keyvault_secrets/defaults/main.yml` for names).
 3. `admin_username` in `vars/homelab_public.yml` (or overrides) matches the actual SSH/admin user on the VM.
 4. `/mnt/media` and `/mnt/media_storage` exist if you rely on Immich or Jellyfin.
@@ -151,16 +129,6 @@ ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
 
 Use a specific snapshot ID instead of `latest` when needed.
 
-## Legacy Migration Restore
-
-If you still have a one-time migration export directory from an old host, run:
-
-```bash
-cd ansible
-ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
-  -e migration_restore_archive_dir=/path/to/export
-```
-
 ## Nightly Backup
 
 The deployed host runs a nightly restic backup at `03:00` by default. Each run:
@@ -182,7 +150,7 @@ Recommended process:
 2. Run a fresh manual backup:
 
 ```bash
-ssh adminuser@ociubuntu "sudo CONTAINER_RUNTIME=docker /opt/homelab/docker_stacks/docker/scripts/backup.sh"
+ssh <your-admin-user>@<your-vm-hostname-or-ip> "sudo CONTAINER_RUNTIME=docker /opt/homelab/docker_stacks/docker/scripts/backup.sh"
 ```
 
 3. Change the pinned image tag or version reference in the relevant compose file.
@@ -199,10 +167,10 @@ For `paperless_ngx`:
 
 1. Keep the image pinned and move deliberately between versions.
 2. Redeploy and verify login, document list, database container, and worker logs.
-3. If a migration fails, restore from the most recent OCI snapshot before trying a different version.
+3. If an upgrade fails, restore from the most recent OCI snapshot before trying a different version.
 
 Version-sensitive notes:
 
-- `paperless_ngx`: DB migrations can make rollback harder if you skip backups.
+- `paperless_ngx`: Django database migrations can make rollback harder if you skip backups.
 - `portainer`: state is disposable convenience state; recreate it rather than preserving incompatible DB files.
 - `n8n`: older SQLite data may require schema repair when moving to newer images.
