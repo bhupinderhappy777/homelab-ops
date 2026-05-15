@@ -1,19 +1,11 @@
 ---
 - name: Restart SSH
   ansible.builtin.service:
-    name: "{{ 'ssh' if ansible_facts['os_family'] == 'Debian' else 'sshd' }}"
+    name: ssh
     state: restarted
-  become: true
-
-- name: Reload firewalld
-  ansible.builtin.service:
-    name: firewalld
-    state: reloaded
-  when: ansible_facts['os_family'] == "RedHat"
   become: true
 
 - name: Reload ufw
   ansible.builtin.command:
     cmd: ufw reload
-  when: ansible_facts['os_family'] == "Debian"
   become: true

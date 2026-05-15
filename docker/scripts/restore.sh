@@ -1,19 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
-
-if [[ "${CONTAINER_RUNTIME}" == "podman" ]] && command -v podman-compose >/dev/null 2>&1; then
-  COMPOSE_CMD=(podman-compose)
-else
-  COMPOSE_CMD=("${CONTAINER_RUNTIME}" compose)
-fi
-
-if [[ "${CONTAINER_RUNTIME}" == "podman" ]] && command -v docker >/dev/null 2>&1; then
-  CONTAINER_CLI="docker"
-else
-  CONTAINER_CLI="${CONTAINER_RUNTIME}"
-fi
+COMPOSE_CMD=(docker compose)
+CONTAINER_CLI="docker"
 
 if [[ -f /etc/homelab/restic.env ]]; then
   set -a

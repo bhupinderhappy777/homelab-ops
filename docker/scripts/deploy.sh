@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
-
-if [[ "${CONTAINER_RUNTIME}" == "podman" ]] && command -v podman-compose >/dev/null 2>&1; then
-    COMPOSE_CMD=(podman-compose)
-else
-    COMPOSE_CMD=("${CONTAINER_RUNTIME}" compose)
-fi
+COMPOSE_CMD=(docker compose)
 
 STACK_NAME=$1
 

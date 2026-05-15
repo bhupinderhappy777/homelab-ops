@@ -95,11 +95,8 @@ Periodically restore onto a clean VM or alternate data directory using `backup_r
 ## Runtime Notes
 
 - On **Ubuntu Server** with Docker Engine, bind mounts use plain host paths; match directory ownership to container UIDs where the stack docs call it out (see Ansible `docker_directories` and `restore.sh` chown steps).
-- Shared read-only media mounts may need no relabel option if the filesystem
-  does not allow xattrs.
-- Rootless Podman cannot bind low ports such as `53`, `81`, or `82` without a
-  host sysctl. Prefer high local ports, or run Pi-hole as a deliberate rootful
-  exception.
+- Shared read-only media mounts may need extra options if the filesystem does not allow xattrs; follow stack-specific notes.
+- Low host ports (for example `53` for Pi-hole) require freeing the port on the host (see Ansible `prepare_host_port53_for_pihole` and stack docs).
 - Portainer data is version-sensitive and excluded from automated backup restore.
   Treat it as convenience state and recreate it when possible.
 - `n8n` uses SQLite by default here; if it matters, migrate it to Postgres later

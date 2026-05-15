@@ -1,8 +1,4 @@
 ---
-- name: Set runtime environment facts
-  ansible.builtin.set_fact:
-    homelab_container_runtime: "{{ container_runtime | lower }}"
-
 - name: Ensure backup configuration directory exists
   ansible.builtin.file:
     path: /etc/homelab
@@ -45,7 +41,7 @@
     name: "homelab_backup"
     hour: "{{ homelab_backup_hour }}"
     minute: "{{ homelab_backup_minute }}"
-    job: "CONTAINER_RUNTIME={{ homelab_container_runtime }} /opt/homelab/docker_stacks/docker/scripts/backup.sh >> /var/log/homelab_backup.log 2>&1"
+    job: "/opt/homelab/docker_stacks/docker/scripts/backup.sh >> /var/log/homelab_backup.log 2>&1"
     user: "root"
 
 - name: Configure logrotate for backup logs

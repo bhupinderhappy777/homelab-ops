@@ -5,8 +5,8 @@ Operator walkthrough: **[docs/README.md](../docs/README.md)**.
 Ansible is responsible for:
 
 - loading secrets from **Azure Key Vault** into play scope (`keyvault_secrets` role)
-- applying baseline **Linux-only** hardening (`security_hardening`; RedHat/Debian families)
-- installing the container runtime, `restic`, and OCI backup helpers
+- applying baseline hardening (`security_hardening`; Ubuntu / Debian family)
+- installing **Docker Engine** (Compose plugin), `restic`, and OCI backup helpers
 - creating `/opt/homelab` directories
 - rendering `/opt/homelab/docker_stacks/docker/.env` from Key Vault–backed facts
 - installing and configuring `cloudflared`
@@ -78,5 +78,3 @@ cd ansible
 ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
   -e backup_restore_snapshot=latest
 ```
-
-With `homelab_container_runtime: "podman"`, the playbook installs Podman, enables `podman.socket`, and uses `podman-compose` for stack deployment. Helper scripts honor `CONTAINER_RUNTIME=podman`.

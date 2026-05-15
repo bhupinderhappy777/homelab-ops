@@ -1,13 +1,13 @@
 - name: Remove stale {{ homelab_stack.compose_network_name }} network if labels do not match
   ansible.builtin.shell: |
     set -euo pipefail
-    if ! {{ container_cli }} network inspect {{ homelab_stack.compose_network_name }} >/dev/null 2>&1; then
+    if ! docker network inspect {{ homelab_stack.compose_network_name }} >/dev/null 2>&1; then
       exit 0
     fi
 
-    compose_label="$({{ container_cli }} network inspect {{ homelab_stack.compose_network_name }} --format '{{"{{"}} index .Labels "com.docker.compose.network" {{"}}"}}')"
+    compose_label="$(docker network inspect {{ homelab_stack.compose_network_name }} --format '{{"{{"}} index .Labels "com.docker.compose.network" {{"}}"}}')"
     if [ "${compose_label}" != "{{ homelab_stack.compose_network_label }}" ]; then
-      {{ container_cli }} network rm {{ homelab_stack.compose_network_name }}
+      docker network rm {{ homelab_stack.compose_network_name }}
     fi
   args:
     executable: /bin/bash

@@ -93,7 +93,7 @@ Make sure only the intended production host is running the production tunnel tok
 ## What the Playbook Does
 1. `keyvault_secrets`: loads `vault_*` facts from Azure Key Vault in **`vault-rg`** (requires `AZURE_KEY_VAULT_URI`, `az login`).
 2. `security_hardening`: applies the baseline Linux hardening tasks.
-3. `base_docker`: installs Docker or Podman, `restic`, and S3-compatible CLI dependencies.
+3. `base_docker`: installs Docker Engine (Compose plugin), `restic`, and S3-compatible CLI dependencies on Ubuntu/Debian.
 4. `docker_directories`: creates the exact bind-mount directories expected by the compose files under `/opt/homelab`.
 5. `docker_stacks_deploy`: clones this repo to `/opt/homelab/docker_stacks`, renders `/opt/homelab/docker/.env`, and deploys the compose stacks.
 6. `docker_backup_cron`: installs the OCI/restic backup and restore scripts, renders `/etc/homelab/restic.env`, and schedules nightly backups.
@@ -112,7 +112,7 @@ Usually yes, but only if all of the following are true:
 If any of those are wrong, the playbook may still complete, but some apps will start with empty directories, broken auth, or missing media mounts.
 
 ## Runtime Notes
-The deploy path now supports both Docker and Podman. If you set `homelab_container_runtime: "podman"`, Ansible deploys stacks with `podman-compose` and also creates a `/usr/local/bin/docker` symlink to `podman` so helper commands can still work through the Docker-compatible CLI when available.
+Stacks and host scripts assume **Docker Engine** with the Compose v2 CLI (`docker compose`) on Ubuntu Server.
 
 ## Restore from Backup
 If you need to restore onto a fresh VM from OCI Object Storage:
