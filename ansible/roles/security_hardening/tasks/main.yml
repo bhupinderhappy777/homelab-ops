@@ -3,10 +3,10 @@
   ansible.builtin.assert:
     that:
       - ansible_facts['os_family'] is defined
-      - ansible_facts['os_family'] in ['RedHat', 'Debian']
+      - ansible_facts['os_family'] == 'Debian'
     fail_msg: >-
       Unsupported OS family {{ ansible_facts['os_family'] | default('unset') }}
-      for security_hardening (Linux only: RedHat or Debian family).
+      for security_hardening (Ubuntu/Debian only in this repository).
   tags:
     - always
     - security
@@ -14,7 +14,7 @@
 
 - name: Include Linux security hardening
   ansible.builtin.include_tasks: linux/main.yml
-  when: ansible_facts['os_family'] in ['RedHat', 'Debian']
+  when: ansible_facts['os_family'] == 'Debian'
   tags:
     - security
     - security:linux

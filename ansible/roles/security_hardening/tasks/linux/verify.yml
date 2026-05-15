@@ -23,7 +23,7 @@
     fail_msg: "SSH service or config failed verification on {{ inventory_hostname }}"
     success_msg: "SSH is secure and running on {{ inventory_hostname }}"
   vars:
-    ssh_service_name: "{{ 'ssh' if ansible_facts['os_family'] == 'Debian' else 'sshd' }}"
+    ssh_service_name: ssh
   tags:
     - security
     - security:verify

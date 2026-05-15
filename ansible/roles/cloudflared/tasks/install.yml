@@ -1,12 +1,17 @@
 ---
-- name: Cloudflared | Install | Detect OS family
+- name: Cloudflared | Install | Assert Debian-family target
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Debian'
+    fail_msg: "cloudflared role supports Debian/Ubuntu only in this repository."
+
+- name: Cloudflared | Install | Set arch fact
   ansible.builtin.set_fact:
-    cloudflared_pkg_type: "{{ 'deb' if ansible_facts['os_family'] == 'Debian' else 'rpm' if ansible_facts['os_family'] == 'RedHat' else 'tar.gz' }}"
     cloudflared_arch: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else 'arm64' if ansible_facts['architecture'] in ['aarch64', 'arm64'] else '386' }}"
     cloudflared_release_url: "https://github.com/cloudflare/cloudflared/releases/download/{{ cloudflared_version }}"
 
-- name: Cloudflared | Install | Debian/Ubuntu
-  when: ansible_facts['os_family'] == 'Debian'
+- name: Cloudflared | Install | Debian/Ubuntu package
+  become: true
   block:
     - name: Cloudflared | Install | Download package
       ansible.builtin.get_url:
@@ -19,25 +24,8 @@
         deb: "/tmp/cloudflared-linux-{{ cloudflared_arch }}.deb"
         state: present
       notify: Restart cloudflared
-  become: true
-
-- name: Cloudflared | Install | RedHat/Fedora
-  when: ansible_facts['os_family'] == 'RedHat'
-  block:
-    - name: Cloudflared | Install | Download package
-      ansible.builtin.get_url:
-        url: "{{ cloudflared_release_url }}/cloudflared-linux-{{ cloudflared_arch }}.rpm"
-        dest: "/tmp/cloudflared-linux-{{ cloudflared_arch }}.rpm"
-        mode: "0644"
-
-    - name: Cloudflared | Install | Install RPM
-      ansible.builtin.yum:
-        name: "/tmp/cloudflared-linux-{{ cloudflared_arch }}.rpm"
-        state: present
-      notify: Restart cloudflared
-  become: true
 
 - name: Cloudflared | Install | Cleanup temp files
   ansible.builtin.file:
-    path: "/tmp/cloudflared-linux-{{ cloudflared_arch }}.{{ cloudflared_pkg_type }}"
+    path: "/tmp/cloudflared-linux-{{ cloudflared_arch }}.deb"
     state: absent

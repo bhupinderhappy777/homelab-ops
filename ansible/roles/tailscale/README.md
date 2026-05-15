@@ -5,7 +5,7 @@ This Ansible role installs and configures Tailscale VPN on Linux systems, enabli
 ## Requirements
 
 - Ansible 2.9 or higher
-- Target systems running Ubuntu, Debian, RHEL, CentOS, or Fedora
+- Target systems running **Ubuntu Server** (or Debian with equivalent packages)
 - A Tailscale account with an authentication key
 
 ## Role Variables
@@ -49,10 +49,7 @@ None.
 
 ### Install Tasks
 
-1. **Debian/Ubuntu**: Adds Tailscale GPG key and repository
-2. **RedHat/Fedora**: Adds Tailscale YUM/DNF repository
-3. **Package Installation**: Installs `tailscale` package
-4. **Service Enable**: Starts and enables `tailscaled` service
+1. **Debian/Ubuntu**: Adds Tailscale GPG key, APT repository, installs `tailscale`, starts `tailscaled`
 
 ### Configure Tasks
 

@@ -1,18 +1,18 @@
 # security_hardening role
 
-This role provides opinionated, CIS-style **paranoid** security hardening for **Linux only**: Red Hat family (RHEL/Alma/Rocky) and Debian/Ubuntu (`os_family` `RedHat` or `Debian`).
+This role provides opinionated, CIS-style **paranoid** security hardening for **Ubuntu Server** and other **Debian-family** hosts (`ansible_facts.os_family == Debian`). It matches the supported VM image in this repository (Ubuntu LTS on Azure).
 
 It is structured to be modular by concern so that you can selectively apply or override behavior via variables and tags.
 
 ## Entry points
 
-- `tasks/main.yml` — asserts a supported Linux family, then includes `tasks/linux/main.yml`.
+- `tasks/main.yml` — asserts Debian family, then includes `tasks/linux/main.yml`.
 
 ### Linux concerns
 
 - `linux/os_baseline.yml` — package updates and basic OS state
 - `linux/auth_access.yml` — SSH configuration (port, root login, password auth)
-- `linux/network_firewall.yml` — firewall packages/services and SSH rules
+- `linux/network_firewall.yml` — UFW packages/services and SSH rules
 - `linux/audit_logging.yml` — ensures `auditd` is present
 - `linux/filesystem.yml` — basic filesystem permission sanity
 - `linux/verify.yml` — SSH syntax and service-state verification
@@ -29,7 +29,7 @@ Defined in `defaults/main.yml`:
 
 - `security_hardening_verify_only` (default: `false`) — When `true`, the role is intended to run verification checks only (you can gate mutating tasks on this variable).
 
-### Linux-specific
+### SSH (Linux)
 
 - `security_hardening_ssh_port` (default: `22`) — SSH port; kept on 22 by default but can be moved to a non-standard port.
 

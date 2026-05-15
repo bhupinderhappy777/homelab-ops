@@ -1,10 +1,7 @@
 ---
-- name: Set runtime command facts
+- name: Set compose command facts
   ansible.builtin.set_fact:
-    container_runtime_normalized: "{{ container_runtime | lower }}"
-    container_cli: "{{ 'podman' if (container_runtime | lower) == 'podman' else 'docker' }}"
-    homelab_compose_cmd: >-
-      {{ 'podman-compose' if (container_runtime | lower) == 'podman' else 'docker compose' }}
+    homelab_compose_cmd: "docker compose"
     homelab_light_stacks:
       - name: torrent-client
         compose_network_name: torrent-client_torrent_client_network
@@ -85,8 +82,8 @@
 - name: Ensure shared and external compose networks exist
   ansible.builtin.shell: |
     set -e
-    if ! {{ container_cli }} network inspect {{ item }} >/dev/null 2>&1; then
-      {{ container_cli }} network create {{ item }}
+    if ! docker network inspect {{ item }} >/dev/null 2>&1; then
+      docker network create {{ item }}
     fi
   args:
     executable: /bin/bash

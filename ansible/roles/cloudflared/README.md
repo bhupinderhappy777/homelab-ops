@@ -6,7 +6,7 @@ service using a pre-created Cloudflare Tunnel token.
 ## Requirements
 
 - Ansible 2.9 or higher
-- Target systems running Ubuntu, Debian, RHEL, CentOS, or Fedora
+- Target systems running **Ubuntu Server** (or Debian with equivalent packages)
 - A Cloudflare Zero Trust tunnel already created in the dashboard
 
 ## Role Variables

@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
-
-if [[ "${CONTAINER_RUNTIME}" == "podman" ]] && command -v docker >/dev/null 2>&1; then
-  CONTAINER_CLI="docker"
-else
-  CONTAINER_CLI="${CONTAINER_RUNTIME}"
-fi
+CONTAINER_CLI="docker"
 
 if [[ -f /etc/homelab/restic.env ]]; then
   set -a
@@ -111,7 +105,7 @@ exec_in "monica-db" sh -lc 'mariadb-dump -umonica -p"$MYSQL_PASSWORD" monica' > 
 cat > "${BACKUP_ROOT}/manifest.txt" <<EOF
 timestamp=${TIMESTAMP}
 host=${HOSTNAME_TAG}
-container_runtime=${CONTAINER_RUNTIME}
+container_runtime=docker
 data_root=${DATA_ROOT}
 restic_repository=${RESTIC_REPOSITORY}
 EOF

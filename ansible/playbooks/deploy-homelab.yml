@@ -4,8 +4,6 @@
   become: yes
   vars_files:
     - ../vars/homelab_public.yml
-  vars:
-    container_runtime: "{{ homelab_container_runtime | default('docker') }}"
 
   roles:
     - role: keyvault_secrets

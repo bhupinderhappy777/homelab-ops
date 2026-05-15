@@ -9,7 +9,7 @@ Terraform, Ansible, and Docker Compose for a production-style **Azure** homelab:
 | Area | What the repository shows |
 |------|-----------------------------|
 | **Infrastructure as code** | Terraform (`azurerm`): resource group, VNet, subnet, NSG, public IP, NIC, Linux VM (including disk sizing and Spot-friendly configuration). |
-| **Configuration management** | Ansible roles for Key Vault–backed facts, Linux hardening, Docker or Podman, data directories, ordered Compose deploy, backup cron, optional restore, tunnel agent, Tailscale. |
+| **Configuration management** | Ansible roles for Key Vault–backed facts, Ubuntu-oriented hardening, Docker Engine, data directories, ordered Compose deploy, backup cron, optional restore, tunnel agent, Tailscale. |
 | **Containers** | Multi-service **Docker Compose** stacks with pinned images, health checks, bind mounts, and documented host paths. |
 | **Security** | No secrets in Git; Key Vault integration; baseline hardening; ingress via tunnel rather than wide exposure of app ports. |
 | **Backup & recovery** | restic to S3-compatible object storage, database dumps, scripted restore with ownership fixes for bind-mounted data. |
@@ -27,7 +27,7 @@ For step-by-step operations, see **[docs/README.md](docs/README.md)**. Repositor
 | [terraform/README-tf.md](terraform/README-tf.md) | Variables and `terraform apply` |
 | [docker/DEPLOYMENT.md](docker/DEPLOYMENT.md) | Playbook role order, tunnel port map, OCI restore |
 | [docker/BACKUP_STRATEGY.md](docker/BACKUP_STRATEGY.md) | restic layout and retention |
-| [ansible/README-ansible.md](ansible/README-ansible.md) | Inventory setup, tags, Podman vs Docker |
+| [ansible/README-ansible.md](ansible/README-ansible.md) | Inventory setup and playbook tags |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Conventions and local checks |
 | [SECURITY.md](SECURITY.md) | Secret handling and reporting |
 

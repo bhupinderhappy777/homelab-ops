@@ -1,13 +1,15 @@
 ---
-# Install container runtime, OCI Object Storage CLI dependencies, and sysctls
+# Install Docker Engine (Ubuntu/Debian), OCI Object Storage CLI dependencies, and sysctls
 
-- name: Set runtime command facts
-  ansible.builtin.set_fact:
-    container_runtime_normalized: "{{ container_runtime | lower }}"
-    container_cli: "{{ 'podman' if (container_runtime | lower) == 'podman' else 'docker' }}"
+- name: Assert Debian-family OS for Docker install
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Debian'
+    fail_msg: >-
+      base_docker supports Debian/Ubuntu only (this homelab targets Ubuntu Server).
 
 - name: Install dependencies
-  ansible.builtin.package:
+  ansible.builtin.apt:
     name:
       - ca-certificates
       - curl
@@ -16,6 +18,7 @@
       - restic
       - unzip
     state: present
+    update_cache: yes
 
 - name: Install Debian-family package helpers
   ansible.builtin.apt:
@@ -24,40 +27,27 @@
       - lsb-release
     state: present
     update_cache: yes
-  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Ensure Docker keyring directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
 
 - name: Add Docker GPG key
   ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
     keyring: /etc/apt/keyrings/docker.gpg
-  when:
-    - container_runtime_normalized == 'docker'
-    - ansible_facts['os_family'] == 'Debian'
 
 - name: Add Docker repository
   ansible.builtin.apt_repository:
     repo: "deb [arch={{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
     state: present
     filename: docker
-  when:
-    - container_runtime_normalized == 'docker'
-    - ansible_facts['os_family'] == 'Debian'
-
-- name: Add Docker CE repository on RedHat family
-  ansible.builtin.yum_repository:
-    name: docker-ce-stable
-    description: Docker CE Stable - $basearch
-    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
-    enabled: yes
-    gpgcheck: yes
-    gpgkey: https://download.docker.com/linux/centos/gpg
-  when:
-    - container_runtime_normalized == 'docker'
-    - ansible_facts['os_family'] == 'RedHat'
 
 - name: Install Docker CE and plugins
-  ansible.builtin.package:
+  ansible.builtin.apt:
     name:
       - docker-ce
       - docker-ce-cli
@@ -65,52 +55,19 @@
       - docker-buildx-plugin
       - docker-compose-plugin
     state: present
-  when: container_runtime_normalized == 'docker'
-
-- name: Install Podman packages
-  ansible.builtin.package:
-    name:
-      - podman
-      - podman-compose
-    state: present
-  when: container_runtime_normalized == 'podman'
-
-- name: Add admin user to podman group when present
-  ansible.builtin.user:
-    name: "{{ admin_username | default('deployuser') }}"
-    groups: podman
-    append: yes
-  when: container_runtime_normalized == 'podman'
-  failed_when: false
+    update_cache: yes
 
 - name: Add admin user to docker group
   ansible.builtin.user:
     name: "{{ admin_username | default('deployuser') }}"
     groups: docker
     append: yes
-  when: container_runtime_normalized == 'docker'
 
 - name: Enable and start Docker service
   ansible.builtin.systemd:
     name: docker
     state: started
     enabled: yes
-  when: container_runtime_normalized == 'docker'
-
-- name: Enable and start Podman socket
-  ansible.builtin.systemd:
-    name: podman.socket
-    state: started
-    enabled: yes
-  when: container_runtime_normalized == 'podman'
-
-- name: Install docker CLI compatibility wrapper for Podman
-  ansible.builtin.file:
-    src: /usr/bin/podman
-    dest: /usr/local/bin/docker
-    state: link
-    force: yes
-  when: container_runtime_normalized == 'podman'
 
 - name: Check if AWS CLI v2 is already installed
   ansible.builtin.stat:
