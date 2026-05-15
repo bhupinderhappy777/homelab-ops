@@ -12,7 +12,7 @@ services:
     - "3002:3001"    # Avoid clash with Paperless AI on 3001; Grafana (when deployed) planned on 3005
 
     volumes:
-    - /opt/homelab/data/uptime-kuma/data:/app/data:Z
+    - /opt/homelab/data/uptime-kuma/data:/app/data
     environment:
       # Uptime Kuma doesn't require many environment variables
       # Configuration is done through the web UI

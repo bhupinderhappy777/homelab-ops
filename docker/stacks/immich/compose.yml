@@ -15,7 +15,7 @@ services:
     - immich_network
 
     volumes:
-    - /opt/homelab/data/immich/uploads:/usr/src/app/upload:Z
+    - /opt/homelab/data/immich/uploads:/usr/src/app/upload
     - /etc/localtime:/etc/localtime:ro
     ports:
     - "2283:2283"
@@ -61,7 +61,7 @@ services:
     networks:
     - immich_network
     volumes:
-    - /opt/homelab/data/immich/immich_redis:/data:Z
+    - /opt/homelab/data/immich/immich_redis:/data
     logging:
       driver: json-file
       options:
@@ -88,7 +88,7 @@ services:
       POSTGRES_DB: 'immich'
       POSTGRES_INITDB_ARGS: '--data-checksums'
     volumes:
-    - /opt/homelab/data/immich/postgres:/var/lib/postgresql/data:Z
+    - /opt/homelab/data/immich/postgres:/var/lib/postgresql/data
     shm_size: 128mb
 
     logging:

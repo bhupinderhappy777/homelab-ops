@@ -1,14 +1,4 @@
 ---
-- name: Check if SELinux is enabled
-  ansible.builtin.command: getenforce
-  register: selinux_status
-  changed_when: false
-  failed_when: false
-
-- name: Set SELinux support fact
-  ansible.builtin.set_fact:
-    selinux_supported: "{{ ansible_os_family == 'RedHat' and selinux_status.rc == 0 and selinux_status.stdout != 'Disabled' }}"
-
 - name: Ensure /opt/homelab/data exists
   ansible.builtin.file:
     path: /opt/homelab/data
@@ -56,59 +46,6 @@
     mode: '0755'
   when: not mnt_media_storage_is_mounted
   become: true
-
-# --- SELinux Context Management (when SELinux is enabled) ---
-- name: Add SELinux file context for /opt/homelab/data
-  community.general.sefcontext:
-    target: '/opt/homelab/data(/.*)?'
-    setype: container_file_t
-    state: present
-  when: selinux_supported
-  register: selinux_fcontext_data
-
-- name: Add SELinux file context for /opt/homelab/media
-  community.general.sefcontext:
-    target: '/opt/homelab/media(/.*)?'
-    setype: container_file_t
-    state: present
-  when: selinux_supported
-  register: selinux_fcontext_media
-
-- name: Add SELinux file context for /mnt/media
-  community.general.sefcontext:
-    target: '/mnt/media(/.*)?'
-    setype: container_file_t
-    state: present
-  when: selinux_supported
-  register: selinux_fcontext_mnt_media
-
-- name: Add SELinux file context for /mnt/media_storage
-  community.general.sefcontext:
-    target: '/mnt/media_storage(/.*)?'
-    setype: container_file_t
-    state: present
-  when: selinux_supported
-  register: selinux_fcontext_mnt_storage
-
-- name: Apply SELinux labels to /opt/homelab/data (recursive)
-  ansible.builtin.command: restorecon -Rv /opt/homelab/data
-  when: selinux_supported and selinux_fcontext_data is changed
-  changed_when: true
-
-- name: Apply SELinux labels to /opt/homelab/media (recursive)
-  ansible.builtin.command: restorecon -Rv /opt/homelab/media
-  when: selinux_supported and selinux_fcontext_media is changed
-  changed_when: true
-
-- name: Apply SELinux labels to /mnt/media (recursive)
-  ansible.builtin.command: restorecon -Rv /mnt/media
-  when: selinux_supported and selinux_fcontext_mnt_media is changed
-  changed_when: true
-
-- name: Apply SELinux labels to /mnt/media_storage (recursive)
-  ansible.builtin.command: restorecon -Rv /mnt/media_storage
-  when: selinux_supported and selinux_fcontext_mnt_storage is changed
-  changed_when: true
 
 - name: Create exact stack data directories used by compose bind mounts
   ansible.builtin.file:

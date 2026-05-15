@@ -94,7 +94,7 @@ Periodically restore onto a clean VM or alternate data directory using `backup_r
 
 ## Runtime Notes
 
-- Fedora/SELinux requires `:Z` on private persistent bind mounts.
+- On **Ubuntu Server** with Docker Engine, bind mounts use plain host paths; match directory ownership to container UIDs where the stack docs call it out (see Ansible `docker_directories` and `restore.sh` chown steps).
 - Shared read-only media mounts may need no relabel option if the filesystem
   does not allow xattrs.
 - Rootless Podman cannot bind low ports such as `53`, `81`, or `82` without a

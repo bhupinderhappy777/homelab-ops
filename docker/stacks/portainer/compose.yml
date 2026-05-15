@@ -18,7 +18,7 @@ services:
 
     volumes:
       # Bind mount for configuration data
-    - /opt/homelab/data/portainer_data:/data:Z
+    - /opt/homelab/data/portainer_data:/data
     - ${CONTAINER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
     restart: unless-stopped
 

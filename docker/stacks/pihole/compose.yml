@@ -21,8 +21,8 @@ services:
       PIHOLE_GID: '1000'
     volumes:
       # Map the shared volumes to the two required Pi-hole subdirectories
-    - /opt/homelab/data/pihole_data/pihole:/etc/pihole:Z
-    - /opt/homelab/data/pihole_data/dnsmasq.d:/etc/dnsmasq.d:Z
+    - /opt/homelab/data/pihole_data/pihole:/etc/pihole
+    - /opt/homelab/data/pihole_data/dnsmasq.d:/etc/dnsmasq.d
     cap_add:
     - NET_ADMIN
     - SYS_NICE

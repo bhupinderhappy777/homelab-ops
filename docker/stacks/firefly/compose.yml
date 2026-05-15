@@ -9,7 +9,7 @@ services:
     networks:
     - firefly_iii
     volumes:
-    - /opt/homelab/data/firefly_iii/firefly_iii_upload:/var/www/html/storage/upload:Z
+    - /opt/homelab/data/firefly_iii/firefly_iii_upload:/var/www/html/storage/upload
     environment:
       APP_ENV: 'production'
       APP_DEBUG: 'false'
@@ -54,7 +54,7 @@ services:
     networks:
     - firefly_iii
     volumes:
-    - /opt/homelab/data/firefly_iii/firefly_iii_db:/var/lib/mysql:Z
+    - /opt/homelab/data/firefly_iii/firefly_iii_db:/var/lib/mysql
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
       MYSQL_USER: 'firefly'
@@ -88,7 +88,7 @@ services:
       FIREFLY_III_URL: 'http://app:8080'
 
     volumes:
-    - /opt/homelab/data/firefly_iii/firefly_iii_importer:/var/www/html/storage/upload:Z
+    - /opt/homelab/data/firefly_iii/firefly_iii_importer:/var/www/html/storage/upload
     healthcheck:
       test: ["CMD-SHELL", "test -f /var/run/apache2/apache2.pid || test -f /var/run/apache2.pid"]
       interval: 30s

@@ -12,8 +12,8 @@ services:
     ports:
     - "5984:5984"
     volumes:
-    - /opt/homelab/data/obsidian/couchdb/data:/opt/couchdb/data:Z
-    - /opt/homelab/data/obsidian/couchdb-etc:/opt/couchdb/etc/local.d:Z
+    - /opt/homelab/data/obsidian/couchdb/data:/opt/couchdb/data
+    - /opt/homelab/data/obsidian/couchdb-etc:/opt/couchdb/etc/local.d
     environment:
       # ❗ REPLACE the values below with your actual credentials
       COUCHDB_USER: '${COUCHDB_USER}'

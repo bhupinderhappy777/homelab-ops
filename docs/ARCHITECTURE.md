@@ -1,5 +1,9 @@
 # Architecture
 
+## Platform
+
+The automation and Compose bind mounts are written for **Ubuntu Server** with **Docker Engine** (default). **Podman** remains optional via `homelab_container_runtime: "podman"` if you prefer it on a compatible host.
+
 ## Repository layout
 
 | Path | Role |
