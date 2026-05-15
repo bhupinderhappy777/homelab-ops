@@ -3,10 +3,6 @@ terraform {
     azurerm = {
       source = "hashicorp/azurerm"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
   }
 
   required_version = ">= 1.2.0"
@@ -14,6 +10,12 @@ terraform {
 
 provider "azurerm" {
   features {}
+}
+
+locals {
+  admin_ssh_public_key = trimspace(
+    var.ssh_public_key != "" ? var.ssh_public_key : file(pathexpand(var.ssh_public_key_path))
+  )
 }
 
 resource "azurerm_resource_group" "rg" {

@@ -24,7 +24,7 @@ CI runs Terraform fmt/validate and Ansible syntax checks on push and pull reques
 
 ### Why CI does not use `az login` or real SSH keys
 
-- **Terraform:** `terraform validate` evaluates configuration including `local.admin_ssh_public_key` in `keyvault.tf`. GitHub-hosted runners do not have your `~/.ssh/homelab_azure.pub`. The workflow sets `TF_VAR_ssh_public_key` to a **syntactically valid placeholder** so `file(...)` is never used in CI. Your real key still comes from `terraform.tfvars` or env when you run Terraform locally or in a release pipeline.
+- **Terraform:** `terraform validate` evaluates `local.admin_ssh_public_key` in `terraform/main.tf`. GitHub-hosted runners do not have your `~/.ssh/homelab_azure.pub`. The workflow sets `TF_VAR_ssh_public_key` to a **syntactically valid placeholder** so `file(...)` is never used in CI. Your real key still comes from `terraform.tfvars` or env when you run Terraform locally or in a release pipeline.
 - **Ansible:** `ansible-playbook --syntax-check` only checks playbook and role **syntax**. It does **not** execute tasks, so `keyvault_secrets` never runs and **Azure CLI is not invoked**. A full `ansible-playbook` run on a real host still needs `az login` (or a federated identity on the controller) and `AZURE_KEY_VAULT_URI`.
 
 To add integration tests later (optional): use [Azure/login](https://github.com/Azure/login) with **OIDC** (preferred) or a **service principal** stored in GitHub encrypted secrets, scope credentials to read-only Key Vault access if possible, and run a constrained playbook (for example `--check` with a throwaway inventory) in a separate job.

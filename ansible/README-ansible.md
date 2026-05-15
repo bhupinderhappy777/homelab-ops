@@ -21,8 +21,7 @@ Ansible is responsible for:
 - `ansible-galaxy collection install -r requirements.yml` (optional for other Azure work; Key Vault reads use `az` only)
 - `az login` on the control machine (used with `az keyvault secret show` for secrets).
 - `export AZURE_KEY_VAULT_URI=...` for the vault in **`vault-rg`** (recommended), e.g.  
-  `export AZURE_KEY_VAULT_URI="$(az keyvault show -g vault-rg -n "$AZURE_KEY_VAULT_NAME" --query properties.vaultUri -o tsv)"`  
-  If you still manage a vault from the compute Terraform root, you can use `terraform output -raw key_vault_uri` instead.
+  `export AZURE_KEY_VAULT_URI="$(az keyvault show -g vault-rg -n "$AZURE_KEY_VAULT_NAME" --query properties.vaultUri -o tsv)"`
 - SSH access to the VM; for **SSH git clone** of this repo on the VM, `ansible.cfg` enables **agent forwarding** — load your GitHub key on the laptop first (`ssh-add -l`).
 
 Non-secret defaults live in committed `vars/homelab_public.yml` (URLs, branch names, `admin_username`, etc.). Override via inventory `group_vars` or `-e` as needed.

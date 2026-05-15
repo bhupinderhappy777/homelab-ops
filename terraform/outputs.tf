@@ -17,12 +17,3 @@ output "admin_username" {
   value       = var.admin_username
 }
 
-output "key_vault_name" {
-  description = "Azure Key Vault name (use with az keyvault secret …)"
-  value       = azurerm_key_vault.homelab.name
-}
-
-output "key_vault_uri" {
-  description = "Azure Key Vault URI (set AZURE_KEY_VAULT_URI for Ansible)"
-  value       = azurerm_key_vault.homelab.vault_uri
-}
