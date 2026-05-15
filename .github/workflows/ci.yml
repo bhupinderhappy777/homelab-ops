@@ -1,3 +1,15 @@
+# Static checks only — no Azure subscription, no `az login`, no VM SSH keys, no `terraform apply`.
+#
+# - Terraform: `validate` evaluates locals; `ssh_public_key` defaults empty and would read
+#   ~/.ssh/homelab_azure.pub on a laptop. Runners do not have that file, so we inject
+#   TF_VAR_ssh_public_key (valid placeholder material; never used for a real apply here).
+#
+# - Ansible: `ansible-playbook --syntax-check` parses YAML only; it does not run tasks,
+#   so `keyvault_secrets` never calls `az` and no Key Vault or VM credentials are required.
+#
+# To add later: a separate job with `azure/login` (OIDC or client secret) + `ansible-playbook
+# --check` or Molecule — keep secrets in GitHub Actions encrypted secrets / OIDC only.
+
 name: CI
 
 on:
@@ -8,6 +20,11 @@ on:
 
 permissions:
   contents: read
+
+env:
+  TF_VAR_ssh_public_key: >-
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGMVdMap2M8Jy8EjCnHqzNBCEU8xyFGW9LLHj9AgMrgW
+    github-actions-ci-placeholder
 
 jobs:
   terraform:
