@@ -1,0 +1,41 @@
+---
+- name: Deploy Complete Homelab Pipeline
+  hosts: azure_vm # From inventory/hosts.ini
+  become: yes
+  vars_files:
+    - ../vars/homelab_public.yml
+  vars:
+    container_runtime: "{{ homelab_container_runtime | default('docker') }}"
+
+  roles:
+    - role: keyvault_secrets
+      tags: ['keyvault', 'secrets', 'always']
+
+    - role: security_hardening
+      tags: ['security', 'hardening']
+
+    - role: base_docker
+      tags: ['base', 'docker']
+
+    - role: docker_directories
+      tags: ['docker', 'directories']
+
+    - role: docker_stacks_deploy
+      tags: ['apps', 'stacks']
+
+    - role: docker_backup_cron
+      tags: ['backup']
+
+ #   - role: docker_migration_restore
+ #     tags: ['migration_restore', 'restore']
+
+    - role: docker_backup_restore
+      tags: ['backup_restore', 'restore']
+
+    - role: cloudflared
+      tags: ['tunnel', 'ingress', 'cloudflared']
+
+    - role: tailscale
+      tags: ["tailscale"]
+      become: true
+      tailscale_auth_key: "{{ vault_tailscale_auth_key }}"

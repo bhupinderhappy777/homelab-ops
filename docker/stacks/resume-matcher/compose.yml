@@ -1,0 +1,47 @@
+version: '3.8'
+
+# Resume Matcher (https://github.com/srbhr/Resume-Matcher)
+# Published on host 3010 (map your hostname in Cloudflare → http://localhost:3010)
+# Data persisted under /opt/homelab/data/resume-matcher_data.
+
+services:
+  resume-matcher:
+    # GHCR currently only publishes `latest` as a stable tag (version tags may be absent).
+    image: ghcr.io/srbhr/resume-matcher:latest
+    hostname: resume-matcher
+    networks:
+    - resume_matcher_network
+    restart: unless-stopped
+
+    ports:
+    - "3010:3000"
+
+    environment:
+      # Configure in-app Settings UI after first login (recommended).
+      # Optional defaults for local Ollama:
+      # LLM_PROVIDER: 'ollama'
+      # LLM_MODEL: 'gemma3:4b'
+      # LLM_API_BASE: 'http://host.docker.internal:11434'
+
+      # Logging (safe defaults)
+      LOG_LEVEL: 'INFO'
+      LOG_LLM: 'WARNING'
+
+    volumes:
+    - /opt/homelab/data/resume-matcher_data:/app/backend/data:Z
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsS http://localhost:3000/api/v1/health >/dev/null']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+networks:
+  resume_matcher_network:
+    driver: bridge

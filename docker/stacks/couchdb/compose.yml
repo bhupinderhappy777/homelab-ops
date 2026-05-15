@@ -1,0 +1,35 @@
+version: '3.9'
+# --- 2. SERVICES SECTION ---
+services:
+  ## COUCHDB DATABASE ##
+  couchdb:
+    image: docker.io/library/couchdb:latest
+    hostname: couchdb
+    networks:
+    - couchdb_network
+    restart: unless-stopped
+
+    ports:
+    - "5984:5984"
+    volumes:
+    - /opt/homelab/data/obsidian/couchdb/data:/opt/couchdb/data:Z
+    - /opt/homelab/data/obsidian/couchdb-etc:/opt/couchdb/etc/local.d:Z
+    environment:
+      # ❗ REPLACE the values below with your actual credentials
+      COUCHDB_USER: '${COUCHDB_USER}'
+      COUCHDB_PASSWORD: '${COUCHDB_PASSWORD}'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+networks:
+  couchdb_network:
+    driver: bridge

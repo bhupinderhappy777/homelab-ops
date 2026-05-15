@@ -1,0 +1,27 @@
+---
+- name: Windows - disable legacy/insecure services
+  ansible.windows.win_service:
+    name: "{{ item }}"
+    state: stopped
+    start_mode: disabled
+  loop:
+    - RemoteRegistry
+    - SSDPSRV
+    - upnphost
+  when: not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:services
+    - security:windows
+
+- name: Windows - optionally disable RDP service (paranoid default)
+  ansible.windows.win_service:
+    name: TermService
+    state: stopped
+    start_mode: disabled
+  when: not (security_hardening_windows_rdp_enabled | default(false))
+  tags:
+    - security
+    - security:services
+    - security:windows
+    - security:rdp

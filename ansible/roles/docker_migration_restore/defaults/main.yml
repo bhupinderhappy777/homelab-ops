@@ -1,0 +1,19 @@
+---
+migration_restore_archive_dir: ""
+migration_restore_stacks:
+  - torrent-client
+  - pihole
+  - portainer
+  - couchdb
+  - docuseal
+  - firefly
+  - monica
+  - openwebui
+  - paperless_ngx
+  - paperless_ai
+  - n8n
+  - resume-matcher
+  - immich
+  - jellyfin
+  - monitoring
+  - uptime-kuma

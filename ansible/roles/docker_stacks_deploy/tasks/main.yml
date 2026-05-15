@@ -1,0 +1,126 @@
+---
+- name: Set runtime command facts
+  ansible.builtin.set_fact:
+    container_runtime_normalized: "{{ container_runtime | lower }}"
+    container_cli: "{{ 'podman' if (container_runtime | lower) == 'podman' else 'docker' }}"
+    homelab_compose_cmd: >-
+      {{ 'podman-compose' if (container_runtime | lower) == 'podman' else 'docker compose' }}
+    homelab_light_stacks:
+      - name: torrent-client
+        compose_network_name: torrent-client_torrent_client_network
+        compose_network_label: torrent_client_network
+      - name: pihole
+        compose_network_name: pihole_pihole_network
+        compose_network_label: pihole_network
+      - name: portainer
+        compose_network_name: portainer_portainer_network
+        compose_network_label: portainer_network
+      - name: couchdb
+        compose_network_name: couchdb_couchdb_network
+        compose_network_label: couchdb_network
+      - name: docuseal
+        compose_network_name: docuseal_docuseal_network
+        compose_network_label: docuseal_network
+      - name: firefly
+        compose_network_name: firefly_firefly_iii
+        compose_network_label: firefly_iii
+      - name: monica
+        compose_network_name: monica_monica_network
+        compose_network_label: monica_network
+    homelab_heavy_stacks:
+      - name: openwebui
+        compose_network_name: openwebui_openwebui_network
+        compose_network_label: openwebui_network
+      - name: paperless_ngx
+        compose_network_name: paperless_ngx_paperless_network
+        compose_network_label: paperless_network
+      - name: paperless_ai
+        compose_network_name: paperless_ai_paperless_ai_network
+        compose_network_label: paperless_ai_network
+      - name: n8n
+        compose_network_name: n8n_n8n_network
+        compose_network_label: n8n_network
+      - name: resume-matcher
+        compose_network_name: resume-matcher_resume_matcher_network
+        compose_network_label: resume_matcher_network
+      - name: immich
+        compose_network_name: immich_immich_network
+        compose_network_label: immich_network
+      - name: jellyfin
+        compose_network_name: jellyfin_jellyfin_network
+        compose_network_label: jellyfin_network
+      - name: monitoring
+        compose_network_name: monitoring_monitoring_network
+        compose_network_label: monitoring_network
+      - name: uptime-kuma
+        compose_network_name: uptime-kuma_uptime_kuma_network
+        compose_network_label: uptime_kuma_network
+
+- name: Ensure /opt/homelab exists for stack checkout
+  ansible.builtin.file:
+    path: /opt/homelab
+    state: directory
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0755'
+
+- name: Clone homelab-ops repo to host
+  ansible.builtin.git:
+    repo: "{{ docker_stacks_repo_url }}"
+    dest: /opt/homelab/docker_stacks
+    version: "{{ docker_stacks_branch | default('main') }}"
+    update: yes
+    accept_hostkey: yes
+    force: yes
+  become: no
+
+- name: Template general .env file
+  ansible.builtin.template:
+    src: homelab.env.j2
+    dest: /opt/homelab/docker_stacks/docker/.env
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0600'
+
+- name: Ensure shared and external compose networks exist
+  ansible.builtin.shell: |
+    set -e
+    if ! {{ container_cli }} network inspect {{ item }} >/dev/null 2>&1; then
+      {{ container_cli }} network create {{ item }}
+    fi
+  args:
+    executable: /bin/bash
+  loop:
+    - cftunnel
+    - openweb_ollama_ai_network
+  register: homelab_networks
+  changed_when: item in homelab_networks.stdout
+
+- name: Prepare host for Pi-hole (free port 53 / systemd-resolved stub)
+  ansible.builtin.include_tasks: prepare_host_port53_for_pihole.yml
+  when: homelab_prepare_host_port53_for_pihole | default(true) | bool
+  tags:
+    - apps
+    - stacks
+    - stacks_light
+    - pihole
+
+- name: Deploy light stacks in specific order
+  ansible.builtin.include_tasks: deploy_stack.yml
+  loop: "{{ homelab_light_stacks }}"
+  loop_control:
+    loop_var: homelab_stack
+  tags:
+    - apps
+    - stacks
+    - stacks_light
+
+- name: Deploy heavy stacks in specific order
+  ansible.builtin.include_tasks: deploy_stack.yml
+  loop: "{{ homelab_heavy_stacks }}"
+  loop_control:
+    loop_var: homelab_stack
+  tags:
+    - apps
+    - stacks
+    - stacks_heavy

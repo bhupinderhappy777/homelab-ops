@@ -1,0 +1,45 @@
+version: '3.8'
+
+# Open WebUI — LLM chat UI (connect your own Ollama / OpenAI-compatible API).
+# Published on host 3009 (map your hostname in Cloudflare → http://localhost:3009).
+# Data: /opt/homelab/data/openwebui_data.
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.8.12
+    hostname: open-webui
+    networks:
+    - openwebui_network
+    restart: unless-stopped
+
+    ports:
+    - "3009:8080"
+
+    environment:
+      # Change after first deploy: openssl rand -hex 32
+      WEBUI_SECRET_KEY: '${OPENWEBUI_SECRET_KEY}'
+      # Public URL behind Cloudflare tunnel (HTTPS at edge)
+      WEBUI_URL: '${OPENWEBUI_URL}'
+      # Optional: point at host Ollama or another stack, e.g. http://ollama:11434
+      # OLLAMA_BASE_URL: 'http://host.docker.internal:11434'
+
+    volumes:
+    - /opt/homelab/data/openwebui_data:/app/backend/data:Z
+    healthcheck:
+      # `wget` is not present in the image; use curl.
+      # The /health endpoint may return non-JSON in some builds; HTTP 200 is sufficient here.
+      test: ['CMD-SHELL', 'curl -fsS http://localhost:8080/health >/dev/null']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+networks:
+  openwebui_network:
+    driver: bridge

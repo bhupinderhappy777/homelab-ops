@@ -1,0 +1,31 @@
+---
+- name: Linux - Setup Firewalld Rich Rules for SSH (RedHat)
+  ansible.posix.firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ item }}" service name="ssh" accept'
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - "100.64.0.0/10"
+    - "198.162.116.140"
+    - "192.168.122.0/24"
+  when: ansible_facts['os_family'] == "RedHat"
+  notify: Reload firewalld
+
+- name: Linux - Disable general SSH service in firewalld (RedHat)
+  ansible.posix.firewalld:
+    service: ssh
+    permanent: true
+    state: disabled
+    immediate: true
+  when: ansible_facts['os_family'] == "RedHat"
+  notify: Reload firewalld
+
+- name: Linux - Allow SSH from Tailscale in UFW (Debian)
+  community.general.ufw:
+    rule: allow
+    src: "100.64.0.0/10"
+    port: ssh
+    proto: tcp
+  when: ansible_facts['os_family'] == "Debian"
+  notify: Reload ufw

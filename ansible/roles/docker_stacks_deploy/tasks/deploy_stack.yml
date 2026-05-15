@@ -1,0 +1,26 @@
+- name: Remove stale {{ homelab_stack.compose_network_name }} network if labels do not match
+  ansible.builtin.shell: |
+    set -euo pipefail
+    if ! {{ container_cli }} network inspect {{ homelab_stack.compose_network_name }} >/dev/null 2>&1; then
+      exit 0
+    fi
+
+    compose_label="$({{ container_cli }} network inspect {{ homelab_stack.compose_network_name }} --format '{{"{{"}} index .Labels "com.docker.compose.network" {{"}}"}}')"
+    if [ "${compose_label}" != "{{ homelab_stack.compose_network_label }}" ]; then
+      {{ container_cli }} network rm {{ homelab_stack.compose_network_name }}
+    fi
+  args:
+    executable: /bin/bash
+  changed_when: false
+
+- name: Deploy {{ homelab_stack.name }} stack
+  ansible.builtin.command:
+    cmd: "{{ homelab_compose_cmd }} --env-file /opt/homelab/docker_stacks/docker/.env up -d --remove-orphans"
+    chdir: "/opt/homelab/docker_stacks/docker/stacks/{{ homelab_stack.name }}"
+  register: compose_output
+  changed_when: >-
+    'Creating' in compose_output.stdout or
+    'Recreating' in compose_output.stdout or
+    'Starting' in compose_output.stdout or
+    'Created' in compose_output.stdout or
+    'Started' in compose_output.stdout

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  torrent-client:
+    build:
+      context: .
+    image: local-transmission:latest
+    hostname: torrent-client
+    user: '1002:1002'
+    networks:
+    - torrent_client_network
+    ports:
+    - "6882:6882"
+    - "9091:9091"
+    volumes:
+    - /home/${ADMIN_USER}/media:/downloads
+    restart: unless-stopped
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  torrent_client_network:
+    driver: bridge

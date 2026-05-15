@@ -1,0 +1,29 @@
+---
+- name: Windows - ensure basic services for management are running
+  ansible.windows.win_service:
+    name: "{{ item }}"
+    state: started
+    start_mode: auto
+  loop:
+    - WinRM
+    - EventLog
+  when: not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:os_baseline
+    - security:windows
+
+- name: Windows - apply security updates (paranoid)
+  ansible.windows.win_updates:
+    category_names:
+      - CriticalUpdates
+      - SecurityUpdates
+      - UpdateRollups
+    reboot: true
+    reboot_timeout: 3600
+  when: not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:os_baseline
+    - security:update
+    - security:windows

@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  role_name: keyvault_secrets
+  description: Load homelab secrets from Azure Key Vault into Ansible facts (vault_*).
+  license: MIT
+  min_ansible_version: "2.14"
+dependencies: []

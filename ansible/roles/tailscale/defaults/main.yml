@@ -1,0 +1,4 @@
+---
+# Tailscale version is managed by official repository
+tailscale_args: ""
+tailscale_up: true

@@ -1,0 +1,48 @@
+version: '3.8'
+
+# --- 1. VOLUMES SECTION ---
+services:
+  portainer:
+    image: docker.io/portainer/portainer-ce:2.19.4  # Pinned version for stability
+
+    # Instructs Portainer to manage the local Docker environment
+    command: -H unix:///var/run/docker.sock
+
+    ports:
+      # Main Web UI (HTTPS)
+    - "9443:9443"
+      # Edge Agent Port
+    - "8000:8000"
+      # Legacy HTTP Port
+    - "9000:9000"
+
+    volumes:
+      # Bind mount for configuration data
+    - /opt/homelab/data/portainer_data:/data:Z
+    - ${CONTAINER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    security_opt:
+    - no-new-privileges:true
+    - label=disable
+
+    networks:
+    - portainer_network
+
+# --- 3. NETWORKS SECTION ---
+networks:
+  portainer_network:
+    driver: bridge

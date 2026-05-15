@@ -1,0 +1,65 @@
+---
+- name: Linux - ensure firewall packages present (Debian)
+  ansible.builtin.package:
+    name: ufw
+    state: present
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - security_hardening_apply_network_firewall | default(true)
+    - not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+
+- name: Linux - enable firewall service (Debian)
+  ansible.builtin.systemd:
+    name: ufw
+    state: started
+    enabled: true
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - security_hardening_apply_network_firewall | default(true)
+    - not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+
+- name: Linux - ensure firewall packages present (RedHat)
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - security_hardening_apply_network_firewall | default(true)
+    - not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+
+- name: Linux - enable firewall service (RedHat)
+  ansible.builtin.systemd:
+    name: firewalld
+    state: started
+    enabled: true
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - security_hardening_apply_network_firewall | default(true)
+    - not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+
+- name: Linux - allow SSH in firewall
+  ansible.builtin.include_tasks: network_firewall_ssh.yml
+  when:
+    - security_hardening_apply_network_firewall | default(true)
+    - not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+    - security:ssh

@@ -1,0 +1,57 @@
+---
+- name: Set runtime environment facts
+  ansible.builtin.set_fact:
+    homelab_container_runtime: "{{ container_runtime | lower }}"
+
+- name: Ensure backup configuration directory exists
+  ansible.builtin.file:
+    path: /etc/homelab
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Install restic environment file for OCI backups
+  ansible.builtin.template:
+    src: restic.env.j2
+    dest: /etc/homelab/restic.env
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Install backup and restore scripts on host
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - src: "{{ playbook_dir }}/../../docker/scripts/backup.sh"
+      dest: /opt/homelab/docker_stacks/docker/scripts/backup.sh
+    - src: "{{ playbook_dir }}/../../docker/scripts/restore.sh"
+      dest: /opt/homelab/docker_stacks/docker/scripts/restore.sh
+
+- name: Create backup log file
+  ansible.builtin.file:
+    path: /var/log/homelab_backup.log
+    state: touch
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0644'
+
+- name: Schedule nightly homelab backup
+  ansible.builtin.cron:
+    name: "homelab_backup"
+    hour: "{{ homelab_backup_hour }}"
+    minute: "{{ homelab_backup_minute }}"
+    job: "CONTAINER_RUNTIME={{ homelab_container_runtime }} /opt/homelab/docker_stacks/docker/scripts/backup.sh >> /var/log/homelab_backup.log 2>&1"
+    user: "root"
+
+- name: Configure logrotate for backup logs
+  ansible.builtin.template:
+    src: logrotate-homelab.j2
+    dest: /etc/logrotate.d/homelab-backup
+    owner: root
+    group: root
+    mode: '0644'

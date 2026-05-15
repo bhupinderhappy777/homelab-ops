@@ -1,0 +1,51 @@
+# Terraform local and generated files
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local variable files should stay out of the public repo
+terraform.tfvars
+terraform.auto.tfvars
+*.tfvars
+
+# Ansible specific
+ansible/vars/secrets.yml
+ansible/scripts/seed_keyvault_hardcoded.local.sh
+ansible/scripts/seed_keyvault_from_env.local.sh
+*.retry
+.vault_pass
+vault_pass.txt
+*.pyc
+__pycache__/
+.ansible/
+
+# IDE
+.vscode/
+.idea/
+.codex
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Logs
+logs/
+*.log
+.env
+docker/.env
+secrets.yml

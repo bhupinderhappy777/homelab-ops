@@ -1,0 +1,150 @@
+---
+- name: Check if SELinux is enabled
+  ansible.builtin.command: getenforce
+  register: selinux_status
+  changed_when: false
+  failed_when: false
+
+- name: Set SELinux support fact
+  ansible.builtin.set_fact:
+    selinux_supported: "{{ ansible_os_family == 'RedHat' and selinux_status.rc == 0 and selinux_status.stdout != 'Disabled' }}"
+
+- name: Ensure /opt/homelab/data exists
+  ansible.builtin.file:
+    path: /opt/homelab/data
+    state: directory
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0755'
+
+- name: Ensure /opt/homelab/media exists
+  ansible.builtin.file:
+    path: /opt/homelab/media
+    state: directory
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0755'
+
+- name: Ensure admin media download path exists
+  ansible.builtin.file:
+    path: "/home/{{ admin_username | default('deployuser') }}/media"
+    state: directory
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0755'
+
+- name: Set mount point facts for media paths
+  ansible.builtin.set_fact:
+    mnt_media_is_mounted: "{{ ansible_mounts | selectattr('mount', 'equalto', '/mnt/media') | list | length > 0 }}"
+    mnt_media_storage_is_mounted: "{{ ansible_mounts | selectattr('mount', 'equalto', '/mnt/media_storage') | list | length > 0 }}"
+
+- name: Ensure /mnt/media exists when not mounted
+  ansible.builtin.file:
+    path: /mnt/media
+    state: directory
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0755'
+  when: not mnt_media_is_mounted
+
+- name: Ensure /mnt/media_storage exists when not mounted
+  ansible.builtin.file:
+    path: /mnt/media_storage
+    state: directory
+    owner: "{{ admin_username | default('deployuser') }}"
+    group: "{{ admin_username | default('deployuser') }}"
+    mode: '0755'
+  when: not mnt_media_storage_is_mounted
+  become: true
+
+# --- SELinux Context Management (when SELinux is enabled) ---
+- name: Add SELinux file context for /opt/homelab/data
+  community.general.sefcontext:
+    target: '/opt/homelab/data(/.*)?'
+    setype: container_file_t
+    state: present
+  when: selinux_supported
+  register: selinux_fcontext_data
+
+- name: Add SELinux file context for /opt/homelab/media
+  community.general.sefcontext:
+    target: '/opt/homelab/media(/.*)?'
+    setype: container_file_t
+    state: present
+  when: selinux_supported
+  register: selinux_fcontext_media
+
+- name: Add SELinux file context for /mnt/media
+  community.general.sefcontext:
+    target: '/mnt/media(/.*)?'
+    setype: container_file_t
+    state: present
+  when: selinux_supported
+  register: selinux_fcontext_mnt_media
+
+- name: Add SELinux file context for /mnt/media_storage
+  community.general.sefcontext:
+    target: '/mnt/media_storage(/.*)?'
+    setype: container_file_t
+    state: present
+  when: selinux_supported
+  register: selinux_fcontext_mnt_storage
+
+- name: Apply SELinux labels to /opt/homelab/data (recursive)
+  ansible.builtin.command: restorecon -Rv /opt/homelab/data
+  when: selinux_supported and selinux_fcontext_data is changed
+  changed_when: true
+
+- name: Apply SELinux labels to /opt/homelab/media (recursive)
+  ansible.builtin.command: restorecon -Rv /opt/homelab/media
+  when: selinux_supported and selinux_fcontext_media is changed
+  changed_when: true
+
+- name: Apply SELinux labels to /mnt/media (recursive)
+  ansible.builtin.command: restorecon -Rv /mnt/media
+  when: selinux_supported and selinux_fcontext_mnt_media is changed
+  changed_when: true
+
+- name: Apply SELinux labels to /mnt/media_storage (recursive)
+  ansible.builtin.command: restorecon -Rv /mnt/media_storage
+  when: selinux_supported and selinux_fcontext_mnt_storage is changed
+  changed_when: true
+
+- name: Create exact stack data directories used by compose bind mounts
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(admin_username | default('deployuser')) }}"
+    group: "{{ item.group | default(admin_username | default('deployuser')) }}"
+    mode: '0755'
+  loop:
+    - { path: "/opt/homelab/data/obsidian/couchdb/data" }
+    - { path: "/opt/homelab/data/obsidian/couchdb-etc" }
+    - { path: "/opt/homelab/data/docuseal_postgres/_data" }
+    - { path: "/opt/homelab/data/docuseal_data" }
+    - { path: "/opt/homelab/data/firefly_iii/firefly_iii_upload" }
+    - { path: "/opt/homelab/data/firefly_iii/firefly_iii_db" }
+    - { path: "/opt/homelab/data/firefly_iii/firefly_iii_importer" }
+    - { path: "/opt/homelab/data/monica/db" }
+    - { path: "/opt/homelab/data/monica/data" }
+    - { path: "/opt/homelab/data/pihole_data/pihole" }
+    - { path: "/opt/homelab/data/pihole_data/dnsmasq.d" }
+    - { path: "/opt/homelab/data/paperless_ngx/paperless_postgres" }
+    - { path: "/opt/homelab/data/paperless_ngx/paperless_redis", owner: "999", group: "999" }
+    - { path: "/opt/homelab/data/paperless_ngx/paperless_consume", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/paperless_ngx/paperless_media", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/paperless_ngx/paperless_data", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/paperless_ngx/paperless_export", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/paperless-ai_data", owner: "1000", group: "1000" }
+    - { path: "/opt/homelab/data/n8n_data", owner: "1000", group: "1000" }
+    - { path: "/opt/homelab/data/openwebui_data" }
+    - { path: "/opt/homelab/data/portainer_data" }
+    - { path: "/opt/homelab/data/immich/uploads" }
+    - { path: "/opt/homelab/data/immich/immich_redis" }
+    - { path: "/opt/homelab/data/immich/postgres" }
+    - { path: "/opt/homelab/data/jellyfin_data/config", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/uptime-kuma/data", owner: "1000", group: "1000" }
+    - { path: "/opt/homelab/data/resume-matcher_data" }
+    - { path: "/opt/homelab/data/prometheus/data", owner: "65534", group: "65534" }
+    - { path: "/opt/homelab/data/grafana/data", owner: "472", group: "472" }
+    - { path: "/opt/homelab/data/loki/data", owner: "10001", group: "10001" }

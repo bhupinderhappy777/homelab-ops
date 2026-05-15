@@ -1,0 +1,15 @@
+# Copy to terraform.tfvars (gitignored) and adjust.
+# prefix           = "homelab"
+# location         = "canadacentral"
+# resource_group   = "homelab-rg"
+# vm_size           = "Standard_E2ads_v6"
+# os_disk_size_gb   = 200
+# admin_username   = "deployuser"
+# environment      = "dev"
+# ssh_allowed_cidr = "203.0.113.10/32"
+
+# Either set your public key inline (sensitive) or point ssh_public_key_path at a file.
+# ssh_public_key = file(pathexpand("~/.ssh/id_ed25519.pub"))  # not valid in .tfvars — use:
+# ssh_public_key = "ssh-ed25519 AAAA... comment"
+
+# ssh_public_key_path = "~/.ssh/homelab_azure.pub"

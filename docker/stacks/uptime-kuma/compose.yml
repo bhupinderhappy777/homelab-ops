@@ -1,0 +1,100 @@
+version: '3.8'
+
+# --- 1. VOLUMES SECTION ---
+services:
+  ## UPTIME KUMA MONITORING ##
+  uptime-kuma:
+    # 1.23.11 was never published on Docker Hub; pin v2 (see uptime-kuma/MONITORS.md).
+    image: docker.io/louislam/uptime-kuma:2.2.1
+    hostname: uptime-kuma
+
+    ports:
+    - "3002:3001"    # Avoid clash with Paperless AI on 3001; Grafana (when deployed) planned on 3005
+
+    volumes:
+    - /opt/homelab/data/uptime-kuma/data:/app/data:Z
+    environment:
+      # Uptime Kuma doesn't require many environment variables
+      # Configuration is done through the web UI
+      TZ: 'America/Vancouver'  # Set your timezone
+    networks:
+    - uptime_kuma_network
+      # Connect to other networks to monitor internal services
+    - couchdb_network
+    - docuseal_network
+    - firefly_iii
+    - immich_network
+    - jellyfin_network
+    - monica_network
+    - n8n_network
+    - paperless_ngx_network
+    - paperless_ai_network
+    - pihole_network
+    - portainer_network
+    - monitoring_network
+    - openwebui_network
+    - resume_matcher_network
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "/app/extra/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+networks:
+  uptime_kuma_network:
+    driver: bridge
+
+  # External networks from other stacks for internal monitoring
+  couchdb_network:
+    external: true
+    name: couchdb_couchdb_network
+  docuseal_network:
+    external: true
+    name: docuseal_docuseal_network
+  firefly_iii:
+    external: true
+    name: firefly_firefly_iii
+  immich_network:
+    external: true
+    name: immich_immich_network
+  jellyfin_network:
+    external: true
+    name: jellyfin_jellyfin_network
+  monica_network:
+    external: true
+    name: monica_monica_network
+  n8n_network:
+    external: true
+    name: n8n_n8n_network
+  paperless_ngx_network:
+    external: true
+    name: paperless_ngx_paperless_network
+  paperless_ai_network:
+    external: true
+    name: paperless_ai_paperless_network
+  pihole_network:
+    external: true
+    name: pihole_pihole_network
+  portainer_network:
+    external: true
+    name: portainer_portainer_network
+  monitoring_network:
+    external: true
+    name: monitoring_monitoring_network
+
+  openwebui_network:
+    external: true
+    name: openwebui_openwebui_network
+
+  resume_matcher_network:
+    external: true
+    name: resume-matcher_resume_matcher_network

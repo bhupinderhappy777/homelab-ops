@@ -1,0 +1,69 @@
+---
+# Secrets are fetched with Azure CLI on the Ansible controller (avoids azure.azcollection lookup + Python/azure_cloud issues).
+- name: Require Azure Key Vault URI
+  ansible.builtin.assert:
+    that:
+      - homelab_azure_key_vault_uri | length > 0
+    fail_msg: >-
+      Set AZURE_KEY_VAULT_URI (e.g. https://yourvault.vault.azure.net/).
+
+- name: Resolve Key Vault name for Azure CLI
+  ansible.builtin.set_fact:
+    homelab_kv_name_effective: >-
+      {{
+        homelab_azure_key_vault_name
+        if (homelab_azure_key_vault_name | default('') | length) > 0
+        else (homelab_azure_key_vault_uri | regex_replace('^https?://([^/.]+)\\..*', '\\1'))
+      }}
+
+- name: Require resolved Key Vault name
+  ansible.builtin.assert:
+    that:
+      - homelab_kv_name_effective | length > 0
+    fail_msg: >-
+      Could not derive vault name from AZURE_KEY_VAULT_URI. Set AZURE_KEY_VAULT_NAME explicitly.
+
+- name: Load homelab secrets from Azure Key Vault (Azure CLI on controller)
+  ansible.builtin.command:
+    argv:
+      - az
+      - keyvault
+      - secret
+      - show
+      - --vault-name
+      - "{{ homelab_kv_name_effective }}"
+      - --name
+      - "{{ item.kv }}"
+      - --query
+      - value
+      - -o
+      - tsv
+  loop: "{{ homelab_keyvault_secret_map }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  changed_when: false
+  register: homelab_kv_cli
+
+- name: Fail if Key Vault secret fetch failed
+  ansible.builtin.assert:
+    that:
+      - item.rc == 0
+      - item.stdout is defined
+      - item.stdout | length > 0
+    fail_msg: >-
+      Secret '{{ item.item.kv }}' missing or empty (rc={{ item.rc }}).
+      Ensure it exists: az keyvault secret show -n {{ homelab_kv_name_effective }} --name {{ item.item.kv }}
+      stderr={{ item.stderr | default('') }}
+  loop: "{{ homelab_kv_cli.results }}"
+  loop_control:
+    label: "{{ item.item.kv }}"
+
+- name: Publish Key Vault values as host facts
+  ansible.builtin.set_fact:
+    "{{ item.item.var }}": "{{ item.stdout }}"
+  loop: "{{ homelab_kv_cli.results }}"
+
+- name: Expose Tailscale auth key for tailscale role
+  ansible.builtin.set_fact:
+    tailscale_auth_key: "{{ vault_tailscale_auth_key }}"

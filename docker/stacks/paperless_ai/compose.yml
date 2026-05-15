@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  paperless-ai:
+    image: docker.io/clusterzx/paperless-ai:3.0.9
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # --- MOVED PORTS SECTION HERE ---
+    ports:
+    - "3001:3000"         # The internal container port (app listens here)
+    # --------------------------------
+
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges=true
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Environment variables
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - PAPERLESS_AI_PORT=3000
+    - RAG_SERVICE_URL=http://rag_service_name:8000
+    - RAG_SERVICE_ENABLED=true
+
+    volumes:
+    - /opt/homelab/data/paperless-ai_data:/app/data:Z
+    networks:
+    - paperless_network
+
+
+networks:
+  paperless_network:
+    driver: bridge

@@ -1,0 +1,28 @@
+---
+# Key Vault secret names use dashes; Ansible vars stay vault_* for template compatibility.
+homelab_azure_key_vault_uri: "{{ lookup('ansible.builtin.env', 'AZURE_KEY_VAULT_URI') | default('', true) | trim }}"
+# Optional; if empty, vault name is derived from AZURE_KEY_VAULT_URI (https://NAME.vault.azure.net/…).
+homelab_azure_key_vault_name: "{{ lookup('ansible.builtin.env', 'AZURE_KEY_VAULT_NAME') | default('', true) | trim }}"
+
+homelab_keyvault_secret_map:
+  - { var: vault_cloudflare_tunnel_token, kv: cloudflare-tunnel-token }
+  - { var: vault_couchdb_user, kv: couchdb-user }
+  - { var: vault_couchdb_password, kv: couchdb-password }
+  - { var: vault_docuseal_postgres_password, kv: docuseal-postgres-password }
+  - { var: vault_firefly_app_key, kv: firefly-app-key }
+  - { var: vault_firefly_db_password, kv: firefly-db-password }
+  - { var: vault_firefly_cron_token, kv: firefly-cron-token }
+  - { var: vault_immich_db_password, kv: immich-db-password }
+  - { var: vault_monica_db_password, kv: monica-db-password }
+  - { var: vault_monica_app_key, kv: monica-app-key }
+  - { var: vault_grafana_password, kv: grafana-password }
+  - { var: vault_openwebui_secret_key, kv: openwebui-secret-key }
+  - { var: vault_paperless_db_user, kv: paperless-db-user }
+  - { var: vault_paperless_db_password, kv: paperless-db-password }
+  - { var: vault_pihole_password, kv: pihole-password }
+  - { var: vault_restic_password, kv: restic-password }
+  - { var: vault_oci_s3_access_key_id, kv: oci-s3-access-key-id }
+  - { var: vault_oci_s3_secret_access_key, kv: oci-s3-secret-access-key }
+  - { var: vault_oci_s3_bucket, kv: oci-s3-bucket }
+  - { var: vault_oci_s3_endpoint, kv: oci-s3-endpoint }
+  - { var: vault_tailscale_auth_key, kv: tailscale-auth-key }
