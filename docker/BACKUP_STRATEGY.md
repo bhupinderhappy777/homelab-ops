@@ -13,7 +13,7 @@ service is stopped or the filesystem snapshot is crash-consistent.
 Use Git for:
 
 - Terraform and Ansible code
-- compose files
+- compose files (including **Grafana dashboard JSON** under `docker/stacks/monitoring/grafana/provisioning/dashboards/`)
 - backup and restore scripts
 - generated-template definitions
 - non-secret documentation
@@ -60,7 +60,7 @@ covered by dumps or are rebuildable:
 - `/opt/homelab/data/immich/immich_redis`
 - `/opt/homelab/data/firefly_iii/firefly_iii_db`
 - `/opt/homelab/data/monica/db`
-- `/opt/homelab/data/grafana`
+- `/opt/homelab/data/grafana` (Grafana **SQLite / user edits** on disk; baseline dashboards are still reloaded from **git** via Compose mounts under `docker/stacks/monitoring/grafana/provisioning/dashboards/`)
 - `/opt/homelab/data/prometheus`
 - `/opt/homelab/data/loki`
 - `/opt/homelab/data/portainer_data`

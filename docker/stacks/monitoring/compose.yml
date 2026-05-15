@@ -2,7 +2,7 @@ version: '3.8'
 
 # =============================================================================
 # UNIFIED MONITORING STACK
-# Prometheus + Grafana + Loki + Promtail + cAdvisor + Node Exporter
+# Prometheus + Grafana + Loki + Promtail + Node Exporter
 #
 # Deploy:  docker compose -f compose.yml up -d
 # Remove:  docker compose -f compose.yml down
@@ -77,6 +77,10 @@ services:
     volumes:
     - /opt/homelab/data/grafana/data:/var/lib/grafana
     - ./grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    - ./grafana/provisioning/dashboards/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+    - ./grafana/provisioning/dashboards/1860.json:/etc/grafana/dashboards-json/1860.json:ro
+    - ./grafana/provisioning/dashboards/14282.json:/etc/grafana/dashboards-json/14282.json:ro
+    - ./grafana/provisioning/dashboards/13639.json:/etc/grafana/dashboards-json/13639.json:ro
 
     environment:
       GF_SERVER_ROOT_URL: '${GRAFANA_ROOT_URL}'
