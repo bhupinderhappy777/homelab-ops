@@ -22,11 +22,11 @@ Read [variables.tf](variables.tf) and [terraform.tfvars.example](terraform.tfvar
 
 ## Outputs
 
-Use the **public IP** (and `admin_username`) in `ansible/inventory/hosts.ini` (copy from [ansible/inventory/hosts.ini.example](../ansible/inventory/hosts.ini.example)).
+Use the **public IP** and **`admin_username` output** in `ansible/inventory/hosts.ini` (copy from [ansible/inventory/hosts.ini.example](../ansible/inventory/hosts.ini.example)); `ansible_user` must equal `admin_username` (default `deployuser`).
 
 ## Operational notes
 
 - **SKU / region:** if `terraform apply` fails on VM size, pick another `vm_size` or region; `az vm list-skus --location <region> --size <prefix> -o table` helps.
-- **SSH:** the NSG allows TCP 22 from `ssh_allowed_cidr`; tighten this in production.
+- **SSH:** the NSG allows TCP 22 from `ssh_allowed_cidr`; tighten this in production. Azure installs your public key only for `admin_username`. Connect with the matching **private** key (same material as `ssh_public_key` / `ssh_public_key_path` in `terraform.tfvars`). Terraform may hide `admin_ssh_key` in plan output when the key variable is marked sensitive; that is expected.
 - **State:** keep `*.tfstate` out of git (see root `.gitignore`); use a remote backend for teams.
 Next step: [docs/README.md](../docs/README.md) (Key Vault + Ansible).

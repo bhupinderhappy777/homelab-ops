@@ -39,11 +39,14 @@
       - -o
       - tsv
   loop: "{{ homelab_keyvault_secret_map }}"
+  loop_control:
+    label: "{{ item.kv }}"
   delegate_to: localhost
   become: false
   run_once: true
   changed_when: false
   register: homelab_kv_cli
+  no_log: true
 
 - name: Fail if Key Vault secret fetch failed
   ansible.builtin.assert:
@@ -58,12 +61,17 @@
   loop: "{{ homelab_kv_cli.results }}"
   loop_control:
     label: "{{ item.item.kv }}"
+  no_log: true
 
 - name: Publish Key Vault values as host facts
   ansible.builtin.set_fact:
     "{{ item.item.var }}": "{{ item.stdout }}"
   loop: "{{ homelab_kv_cli.results }}"
+  loop_control:
+    label: "{{ item.item.kv }}"
+  no_log: true
 
 - name: Expose Tailscale auth key for tailscale role
   ansible.builtin.set_fact:
     tailscale_auth_key: "{{ vault_tailscale_auth_key }}"
+  no_log: true

@@ -4,7 +4,7 @@
 # resource_group   = "homelab-rg"
 # vm_size           = "Standard_E2ads_v6"
 # os_disk_size_gb   = 200
-# admin_username   = "deployuser"
+# admin_username   = "deployuser"   # must match ansible_user in ansible/inventory/hosts.ini
 # environment      = "dev"
 # ssh_allowed_cidr = "203.0.113.10/32"
 

@@ -1,4 +1,7 @@
-# Copy to hosts.ini (gitignored) and set your VM public IP and Terraform admin_username.
+# Copy to hosts.ini (gitignored) and set your VM public IP.
 #   cp ansible/inventory/hosts.ini.example ansible/inventory/hosts.ini
+#
+# ansible_user MUST match Terraform admin_username (default deployuser), not your laptop login.
+# SSH with the private key that matches ssh_public_key / ssh_public_key_path from terraform.tfvars.
 [azure_vm]
-<your-vm-public-ip> ansible_user=<your-admin-username>
+<your-vm-public-ip> ansible_user=deployuser
