@@ -28,7 +28,7 @@ services:
       LOG_LLM: 'WARNING'
 
     volumes:
-    - /opt/homelab/data/resume-matcher_data:/app/backend/data:Z
+    - /opt/homelab/data/resume-matcher_data:/app/backend/data
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://localhost:3000/api/v1/health >/dev/null']
       interval: 30s

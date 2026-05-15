@@ -35,7 +35,7 @@ services:
     - "9090:9090"
 
     volumes:
-    - /opt/homelab/data/prometheus/data:/prometheus:z
+    - /opt/homelab/data/prometheus/data:/prometheus
     - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro,z
 
     networks:
@@ -76,7 +76,7 @@ services:
     - "3005:3000"
 
     volumes:
-    - /opt/homelab/data/grafana/data:/var/lib/grafana:z
+    - /opt/homelab/data/grafana/data:/var/lib/grafana
     - ./grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro,z
     - ./grafana/provisioning/dashboards/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro,z
     - ./grafana/provisioning/dashboards/1860.json:/etc/grafana/dashboards-json/1860.json:ro,z
@@ -119,7 +119,7 @@ services:
     command: -config.file=/etc/loki/loki-config.yml
 
     volumes:
-    - /opt/homelab/data/loki/data:/loki:z
+    - /opt/homelab/data/loki/data:/loki
     - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro,z
 
     networks:

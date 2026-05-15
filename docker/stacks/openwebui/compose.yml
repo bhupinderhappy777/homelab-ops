@@ -24,7 +24,7 @@ services:
       # OLLAMA_BASE_URL: 'http://host.docker.internal:11434'
 
     volumes:
-    - /opt/homelab/data/openwebui_data:/app/backend/data:Z
+    - /opt/homelab/data/openwebui_data:/app/backend/data
     healthcheck:
       # `wget` is not present in the image; use curl.
       # The /health endpoint may return non-JSON in some builds; HTTP 200 is sufficient here.

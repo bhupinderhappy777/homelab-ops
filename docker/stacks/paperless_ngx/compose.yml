@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
     volumes:
-    - /opt/homelab/data/paperless_ngx/paperless_postgres:/var/lib/postgresql/data:Z
+    - /opt/homelab/data/paperless_ngx/paperless_postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: '${PAPERLESS_DB_USER}'         # ❗ CHANGE THIS
       POSTGRES_PASSWORD: '${PAPERLESS_DB_PASSWORD}' # ❗ CHANGE THIS
@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
 
     volumes:
-    - /opt/homelab/data/paperless_ngx/paperless_redis:/data:Z
+    - /opt/homelab/data/paperless_ngx/paperless_redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -77,10 +77,10 @@ services:
     - "8001:8000"
 
     volumes:
-    - /opt/homelab/data/paperless_ngx/paperless_consume:/usr/src/paperless/consume:Z
-    - /opt/homelab/data/paperless_ngx/paperless_media:/usr/src/paperless/media:Z
-    - /opt/homelab/data/paperless_ngx/paperless_data:/usr/src/paperless/data:Z
-    - /opt/homelab/data/paperless_ngx/paperless_export:/usr/src/paperless/export:Z
+    - /opt/homelab/data/paperless_ngx/paperless_consume:/usr/src/paperless/consume
+    - /opt/homelab/data/paperless_ngx/paperless_media:/usr/src/paperless/media
+    - /opt/homelab/data/paperless_ngx/paperless_data:/usr/src/paperless/data
+    - /opt/homelab/data/paperless_ngx/paperless_export:/usr/src/paperless/export
     environment:
       # Database configuration
       PAPERLESS_DBHOST: 'db'

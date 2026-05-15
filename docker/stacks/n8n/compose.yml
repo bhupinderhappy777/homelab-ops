@@ -24,8 +24,8 @@ services:
       N8N_USER_FOLDER: '/data'
       WEBHOOK_URL: '${N8N_WEBHOOK_URL}'
     volumes:
-    - /opt/homelab/data/n8n_data:/data:Z
-    - /opt/homelab/media:/home/node/downloads:z
+    - /opt/homelab/data/n8n_data:/data
+    - /opt/homelab/media:/home/node/downloads
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
       interval: 30s

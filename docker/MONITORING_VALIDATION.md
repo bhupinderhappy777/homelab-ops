@@ -1,4 +1,4 @@
-# Monitoring Stack Validation for Podman
+# Monitoring stack validation (Docker / Podman)
 
 ## Overview
 
@@ -17,7 +17,8 @@ The unified monitoring stack includes:
 docker compose -f docker/stacks/monitoring/compose.yml up -d
 ```
 
-### Podman (Recommended for SELinux)
+### Podman (optional)
+
 ```bash
 # Ensure CONTAINER_SOCKET_PATH in .env points to Podman socket
 export CONTAINER_SOCKET_PATH=/run/user/1000/podman/podman.sock  # rootless
@@ -29,7 +30,7 @@ podman-compose -f docker/stacks/monitoring/compose.yml up -d
 
 ## Pre-Deployment Checklist
 
-- [ ] SELinux labels applied to `/opt/homelab/data` (via `ansible/roles/docker_directories`)
+- [ ] `/opt/homelab/data` and stack subdirectories exist with expected ownership after Ansible (`docker_directories` role)
 - [ ] External networks exist (couchdb, docuseal, firefly, immich, jellyfin, monica, n8n, paperless_*, pihole, portainer)
 - [ ] `.env` file has `CONTAINER_SOCKET_PATH` set correctly
 - [ ] Prometheus and Grafana have sufficient disk for time-series retention (default 15 days)

@@ -38,7 +38,7 @@ services:
     - RAG_SERVICE_ENABLED=true
 
     volumes:
-    - /opt/homelab/data/paperless-ai_data:/app/data:Z
+    - /opt/homelab/data/paperless-ai_data:/app/data
     networks:
     - paperless_network
 

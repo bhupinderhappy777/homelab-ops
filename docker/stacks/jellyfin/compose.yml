@@ -29,7 +29,7 @@ services:
       # NOTE: You may need to map additional ports (e.g., 8920 for HTTPS/other protocols)
     volumes:
       # Local volumes
-    - /opt/homelab/data/jellyfin_data/config:/config:Z
+    - /opt/homelab/data/jellyfin_data/config:/config
     - jellyfin_cache:/cache
     - /mnt/media_storage:/mnt/media:ro
     - /home/adminuser/media:/media:ro
