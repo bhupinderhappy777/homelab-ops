@@ -98,17 +98,12 @@ cloudflared_tunnel_token: !vault |
           <encrypted output>
 ```
 
-### 3. Run the Playbook
+### 3. Run the playbook
 
 ```bash
-# Syntax check
-ansible-playbook playbooks/server.yml --tags cloudflared --syntax-check
-
-# Run on all OCI nodes
-ansible-playbook playbooks/server.yml --tags cloudflared
-
-# Run on specific host
-ansible-playbook playbooks/server.yml --tags cloudflared -l ociubuntu
+cd ansible
+ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml --syntax-check
+ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml --tags tunnel,ingress,cloudflared
 ```
 
 ### 4. Verify

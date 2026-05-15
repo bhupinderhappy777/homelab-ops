@@ -1,2 +1,0 @@
----
-# Optional vault-backed vars removed; use SSH agent or HTTPS for dotfiles.

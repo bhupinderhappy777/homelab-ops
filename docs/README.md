@@ -52,26 +52,16 @@ export AZURE_KEY_VAULT_URI="$(az keyvault show -g vault-rg -n "$AZURE_KEY_VAULT_
 
 ## 4. Seed secrets (one-time)
 
-Pick one:
+Ansible loads `vault_*` facts from Key Vault using the name mapping in [ansible/roles/keyvault_secrets/defaults/main.yml](../ansible/roles/keyvault_secrets/defaults/main.yml). Create each secret under **`vault-rg`** with the **hyphenated** names that file documents (they correspond to `vault_*` variables in play scope).
 
-**A. From a local YAML file** (keys must be `vault_*`; never commit the file):
-
-```bash
-cd /path/to/homelab-ops
-ansible-galaxy collection install -r ansible/requirements.yml
-export AZURE_KEY_VAULT_NAME='<your-vault-name>'
-python3 ansible/scripts/import_vars_yaml_to_keyvault.py /path/to/local-secrets.yaml
-```
-
-**B. From `docker/.env`** (copy from [docker/.env.example](../docker/.env.example), fill values; file is gitignored):
+Example:
 
 ```bash
 export AZURE_KEY_VAULT_NAME='<your-vault-name>'
-./ansible/scripts/seed_keyvault_hardcoded.example.sh
-# or: ./ansible/scripts/seed_keyvault_hardcoded.example.sh /path/to/.env
+az keyvault secret set --vault-name "$AZURE_KEY_VAULT_NAME" --name "grafana-password" --value "$(openssl rand -hex 16)"
 ```
 
-Key name mapping: [ansible/roles/keyvault_secrets/defaults/main.yml](../ansible/roles/keyvault_secrets/defaults/main.yml).
+Repeat for every secret your stacks require. For many keys at once, use your own private loop or script locally—**never** commit plaintext secrets or seed files.
 
 ## 5. Deploy the homelab
 
@@ -89,7 +79,7 @@ ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/d
   -e backup_restore_snapshot=latest
 ```
 
-Common Ansible tags on `deploy-homelab.yml`: `keyvault`, `security`, `base`, `docker`, `directories`, `stacks`, `backup`, `backup_restore`, `tunnel`, `tailscale`. The `chezmoi` tag applies to [server.yml](../ansible/playbooks/server.yml), not the homelab VM deploy playbook.
+Common Ansible tags on `deploy-homelab.yml`: `keyvault`, `security`, `base`, `docker`, `directories`, `stacks`, `backup`, `backup_restore`, `tunnel`, `tailscale`.
 
 ## 6. Cloudflare Tunnel
 
@@ -99,11 +89,7 @@ Create the tunnel and routes in Cloudflare Zero Trust. Ansible installs `cloudfl
 
 - Strategy and retention: [docker/BACKUP_STRATEGY.md](../docker/BACKUP_STRATEGY.md)
 - Scripts on the host (after deploy): `/opt/homelab/docker_stacks/docker/scripts/backup.sh`, `restore.sh`
-- Manual backup example: `sudo CONTAINER_RUNTIME=docker /opt/homelab/docker_stacks/docker/scripts/backup.sh`
-
-## 8. Dotfiles (optional, not the VM deploy playbook)
-
-[ansible/playbooks/server.yml](../ansible/playbooks/server.yml) applies [chezmoi](../ansible/roles/chezmoi) using `dotfiles_repo` from [ansible/vars/homelab_public.yml](../ansible/vars/homelab_public.yml). Use `--skip-tags chezmoi` if unused.
+- Manual backup example: `sudo /opt/homelab/docker_stacks/docker/scripts/backup.sh`
 
 ## Further reading
 
@@ -114,13 +100,3 @@ Create the tunnel and routes in Cloudflare Zero Trust. Ansible installs `cloudfl
 | Adding a stack | [docker/ADDING_SERVICE.md](../docker/ADDING_SERVICE.md) |
 | Ansible details | [ansible/README-ansible.md](../ansible/README-ansible.md) |
 | Security | [SECURITY.md](../SECURITY.md) |
-
-## Replacing Git history on the remote
-
-If you created a **new root commit** (no prior history) and need to overwrite `origin/main`:
-
-```bash
-git push --force-with-lease origin main
-```
-
-Everyone with an old clone must **fetch reset** or **re-clone**. Rotate any credential that might have existed in old commits.

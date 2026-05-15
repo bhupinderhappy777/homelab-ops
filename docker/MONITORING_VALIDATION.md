@@ -5,10 +5,9 @@
 The unified monitoring stack includes:
 
 - **Prometheus**: Metrics collection and alerting (scrapes all services)
-- **Grafana**: Visualization and dashboarding
+- **Grafana**: Visualization and dashboarding (no dashboards are shipped in git; import or build in the UI)
 - **Loki**: Log aggregation
 - **Promtail**: Log shipper with Docker service discovery
-- **cAdvisor**: Container metrics (expects Docker Engine)
 - **node-exporter**: Host system metrics
 
 ## Bring up the stack
@@ -38,7 +37,7 @@ curl -sS http://localhost:9090/-/healthy
 curl -sS http://localhost:9090/api/v1/targets | jq .data.activeTargets[].labels
 ```
 
-Expect scrape targets **UP** where the application and `node-exporter` are running. cAdvisor can be down if the profile is disabled or the socket is wrong; fix the Docker socket path first.
+Expect scrape targets **UP** where the application and `node-exporter` are running. If a target is down, confirm the container is up and DNS from the Prometheus container matches the scrape config.
 
 ### Grafana (3005)
 
@@ -59,12 +58,6 @@ docker logs -f "$(docker ps -q -f name=monitoring_promtail)" 2>&1 | head -50
 ```
 
 Expect messages indicating Docker target discovery against `CONTAINER_SOCKET_PATH`.
-
-### cAdvisor (8080)
-
-```bash
-curl -sS http://localhost:8080/api/v1/machine 2>&1 | head -20
-```
 
 ### node-exporter (9100)
 
@@ -97,7 +90,7 @@ Check the app container is running (`docker ps`), DNS names in Prometheus config
 - [ ] Grafana `/api/health` returns 200
 - [ ] Loki `/ready` returns 200
 - [ ] Promtail logs show container discovery
-- [ ] Grafana shows data sources and dashboards
+- [ ] Grafana shows data sources (dashboards are optional; add in UI or import by ID)
 
 ## Cleanup
 
@@ -113,4 +106,3 @@ Persistent data under `/opt/homelab/data/prometheus`, `grafana`, `loki` remains 
 - Grafana: https://grafana.com/docs/
 - Loki: https://grafana.com/docs/loki/latest/
 - Promtail Docker SD: https://grafana.com/docs/loki/latest/clients/promtail/scrape-configs/#docker
-- cAdvisor: https://github.com/google/cadvisor

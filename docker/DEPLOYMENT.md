@@ -33,7 +33,7 @@ Use the same SSH user as Terraform `admin_username`.
 
 ## 3. Azure Key Vault and secrets (`vault-rg`)
 
-Use the canonical steps in **[docs/README.md](../docs/README.md)** (Key Vault in `vault-rg`, `AZURE_KEY_VAULT_*` exports, YAML import or `seed_keyvault_hardcoded.example.sh`, and non-secret defaults in [ansible/vars/homelab_public.yml](../ansible/vars/homelab_public.yml)).
+Use the canonical steps in **[docs/README.md](../docs/README.md)** (Key Vault in `vault-rg`, `AZURE_KEY_VAULT_*` exports, `az keyvault secret set`, and non-secret defaults in [ansible/vars/homelab_public.yml](../ansible/vars/homelab_public.yml)).
 
 The deploy-time env file on the VM is rendered at `/opt/homelab/docker_stacks/docker/.env` from [ansible/roles/docker_stacks_deploy/templates/homelab.env.j2](../ansible/roles/docker_stacks_deploy/templates/homelab.env.j2).
 

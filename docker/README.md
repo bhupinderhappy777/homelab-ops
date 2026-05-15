@@ -26,8 +26,8 @@ A new service is only complete when:
 - its compose file exists,
 - Ansible creates its bind mounts,
 - Ansible deploys it,
-- backup/restore behavior is decided,
-- and its explanation doc is updated.
+- backup/restore behavior is decided.
+- [docker/DEPLOYMENT.md](DEPLOYMENT.md) is updated if tunnel routes or notable ports change.
 
 ## Updating stack versions
 
