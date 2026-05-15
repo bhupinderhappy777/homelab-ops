@@ -79,7 +79,7 @@ Key name mapping: [ansible/roles/keyvault_secrets/defaults/main.yml](../ansible/
 cd ansible
 ANSIBLE_CONFIG=./ansible.cfg ansible-galaxy collection install -r requirements.yml
 ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
-  --skip-tags migration_restore,backup_restore
+  --skip-tags backup_restore
 ```
 
 **Restore from OCI on first boot** (after Key Vault is populated and `restic` env secrets exist):
@@ -87,13 +87,6 @@ ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/d
 ```bash
 ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
   -e backup_restore_snapshot=latest
-```
-
-**One-time migration import** (mutually exclusive with snapshot restore in the same run):
-
-```bash
-ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/deploy-homelab.yml \
-  -e migration_restore_archive_dir=/path/to/export
 ```
 
 Common Ansible tags on `deploy-homelab.yml`: `keyvault`, `security`, `base`, `docker`, `directories`, `stacks`, `backup`, `backup_restore`, `tunnel`, `tailscale`. The `chezmoi` tag applies to [server.yml](../ansible/playbooks/server.yml), not the homelab VM deploy playbook.
@@ -117,7 +110,7 @@ Create the tunnel and routes in Cloudflare Zero Trust. Ansible installs `cloudfl
 | Topic | Doc |
 |--------|-----|
 | Repo layout | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Deep deploy / migration paths | [docker/DEPLOYMENT.md](../docker/DEPLOYMENT.md) |
+| Deep deploy and OCI restore | [docker/DEPLOYMENT.md](../docker/DEPLOYMENT.md) |
 | Adding a stack | [docker/ADDING_SERVICE.md](../docker/ADDING_SERVICE.md) |
 | Ansible details | [ansible/README-ansible.md](../ansible/README-ansible.md) |
 | Security | [SECURITY.md](../SECURITY.md) |

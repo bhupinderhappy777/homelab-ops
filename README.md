@@ -25,7 +25,7 @@ For step-by-step operations, see **[docs/README.md](docs/README.md)**. Repositor
 | [docs/README.md](docs/README.md) | Operator runbook (Terraform → Key Vault → Ansible → backups) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Directory layout and controller vs VM responsibilities |
 | [terraform/README-tf.md](terraform/README-tf.md) | Variables and `terraform apply` |
-| [docker/DEPLOYMENT.md](docker/DEPLOYMENT.md) | Playbook role order, tunnel port map, migration notes |
+| [docker/DEPLOYMENT.md](docker/DEPLOYMENT.md) | Playbook role order, tunnel port map, OCI restore |
 | [docker/BACKUP_STRATEGY.md](docker/BACKUP_STRATEGY.md) | restic layout and retention |
 | [ansible/README-ansible.md](ansible/README-ansible.md) | Inventory setup, tags, Podman vs Docker |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Conventions and local checks |
