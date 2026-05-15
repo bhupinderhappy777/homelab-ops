@@ -11,6 +11,7 @@
     fi
   args:
     executable: /bin/bash
+  # Intentionally not "changed" when a stale network is removed — avoids noisy plays; use -v to see shell output.
   changed_when: false
 
 - name: Deploy {{ homelab_stack.name }} stack
@@ -18,9 +19,9 @@
     cmd: "{{ homelab_compose_cmd }} --env-file /opt/homelab/docker_stacks/docker/.env up -d --remove-orphans"
     chdir: "/opt/homelab/docker_stacks/docker/stacks/{{ homelab_stack.name }}"
   register: compose_output
+  # Compose v2 often writes progress to stderr; include both streams so first deploy shows changed.
   changed_when: >-
-    'Creating' in compose_output.stdout or
-    'Recreating' in compose_output.stdout or
-    'Starting' in compose_output.stdout or
-    'Created' in compose_output.stdout or
-    'Started' in compose_output.stdout
+    (
+      compose_output.stdout | default('')
+      ~ compose_output.stderr | default('')
+    ) is search('(?i)(creating|recreating|starting|started|created|pulled|pulling|downloaded|removing|removed)')
