@@ -13,7 +13,7 @@ Terraform, Ansible, and Docker Compose for a production-style **Azure** homelab:
 | **Containers** | Multi-service **Docker Compose** stacks with pinned images, health checks, bind mounts, and documented host paths. |
 | **Security** | No secrets in Git; Key Vault integration; baseline hardening; ingress via tunnel rather than wide exposure of app ports. |
 | **Backup & recovery** | restic to S3-compatible object storage, database dumps, scripted restore with ownership fixes for bind-mounted data. |
-| **Observability** | Prometheus, Grafana, Loki, and Promtail definitions under `docker/stacks/monitoring`. |
+| **Observability** | Prometheus, Grafana (dashboards file-provisioned from `docker/stacks/monitoring/grafana/provisioning/dashboards/`), Loki, and Promtail under `docker/stacks/monitoring`. |
 | **Quality gates** | GitHub Actions: `terraform fmt -check`, `terraform validate`, and `ansible-playbook --syntax-check` on every push to `main`. |
 
 For step-by-step operations, see **[docs/README.md](docs/README.md)**. Repository layout and data flow: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
@@ -26,7 +26,7 @@ For step-by-step operations, see **[docs/README.md](docs/README.md)**. Repositor
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Directory layout and controller vs VM responsibilities |
 | [terraform/README-tf.md](terraform/README-tf.md) | Variables and `terraform apply` |
 | [docker/DEPLOYMENT.md](docker/DEPLOYMENT.md) | Playbook role order, tunnel port map, OCI restore |
-| [docker/BACKUP_STRATEGY.md](docker/BACKUP_STRATEGY.md) | restic layout and retention |
+| [docker/MONITORING_VALIDATION.md](docker/MONITORING_VALIDATION.md) | Smoke tests for the monitoring stack |
 | [ansible/README-ansible.md](ansible/README-ansible.md) | Inventory setup and playbook tags |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Conventions and local checks |
 | [SECURITY.md](SECURITY.md) | Secret handling and reporting |

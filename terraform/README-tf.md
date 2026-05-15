@@ -29,5 +29,6 @@ Use the **public IP** (and `admin_username`) in `ansible/inventory/hosts.ini` (c
 - **SKU / region:** if `terraform apply` fails on VM size, pick another `vm_size` or region; `az vm list-skus --location <region> --size <prefix> -o table` helps.
 - **SSH:** the NSG allows TCP 22 from `ssh_allowed_cidr`; tighten this in production.
 - **State:** keep `*.tfstate` out of git (see root `.gitignore`); use a remote backend for teams.
+- **Outputs:** `key_vault_name` / `key_vault_uri` refer to an optional vault created **in the compute resource group** (`keyvault.tf`). For the runbook flow, you can still point `AZURE_KEY_VAULT_URI` at a vault in **`vault-rg`** instead; Ansible only needs a vault it can read with `az keyvault secret show`.
 
 Next step: [docs/README.md](../docs/README.md) (Key Vault + Ansible).

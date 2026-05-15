@@ -150,7 +150,7 @@ Recommended process:
 2. Run a fresh manual backup:
 
 ```bash
-ssh <your-admin-user>@<your-vm-hostname-or-ip> "sudo CONTAINER_RUNTIME=docker /opt/homelab/docker_stacks/docker/scripts/backup.sh"
+ssh <your-admin-user>@<your-vm-hostname-or-ip> "sudo /opt/homelab/docker_stacks/docker/scripts/backup.sh"
 ```
 
 3. Change the pinned image tag or version reference in the relevant compose file.
