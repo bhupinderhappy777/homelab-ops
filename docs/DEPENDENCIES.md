@@ -8,7 +8,7 @@ This page lists **outside services, networks, and tooling** the repository and a
 |------------|------------------|--------|
 | **Microsoft Azure** (subscription) | Terraform `azurerm` provider | Creates VM, VNet, NSG, public IP, NIC, resource group. Requires credentials for `terraform plan` / `apply` (`az login`, service principal, or OIDC in CI). |
 | **Azure Key Vault** (recommended: resource group **`vault-rg`**) | Ansible `keyvault_secrets` | Secrets read at deploy time via **`az keyvault secret show`** on the **control machine** (`delegate_to: localhost`). Requires `az login` and RBAC on the vault (Get/List on secrets; Set when seeding). |
-| **Oracle Cloud Infrastructure (OCI)** | `restic` backups on the VM | S3-compatible **Object Storage** + API keys in Key Vault (`vault_oci_s3_*`, `AWS_*` for the AWS CLI–compatible client). VM must reach your OCI region endpoint from outbound HTTPS. |
+| **Oracle Cloud Infrastructure (OCI)** | `restic` backups on the VM | S3-compatible **Object Storage** + customer-secret keys in Key Vault (`vault_oci_s3_*`). Backup scripts export `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_DEFAULT_REGION` because restic’s S3 backend expects those names; **no AWS CLI** is required. VM must reach your OCI region endpoint over outbound HTTPS. |
 
 Terraform in this repo **does not** create Key Vault; manage the vault separately (Portal, CLI, or your own IaC). See [README.md](README.md) and [docs/README.md](README.md).
 
@@ -33,7 +33,7 @@ GitHub Actions CI only runs **static** checks (`terraform validate`, `ansible-pl
 | **Docker CE** (`download.docker.com`) | `base_docker` adds Docker’s apt repo and installs Engine + Compose plugin. |
 | **GitHub** `releases` | `cloudflared` `.deb` downloaded from `https://github.com/cloudflare/cloudflared/releases/`. |
 | **Tailscale package repo** (`pkgs.tailscale.com`) | `tailscale` role adds apt repo and installs `tailscaled`. |
-| **AWS CLI v2 bundle** (`awscli.amazonaws.com`) | Installed on the VM by `base_docker` for S3-compatible OCI backups (not Azure’s Python SDK). |
+| **restic** (`apt`, via `base_docker`) | OCI Object Storage backups and restores; talks to the S3-compatible API using env vars from `/etc/homelab/restic.env` (see `docker_backup_cron`). |
 | **Container registries** | Compose pulls images from **`docker.io`**, **`ghcr.io`**, and (for `torrent-client`) a **local** image build. Outbound HTTPS to registries must be allowed. |
 | **DNS + outbound HTTPS** | Image pulls, `apt`, `get_url`, Tailscale control plane, Cloudflare tunnel, OCI S3 API, optional Grafana.com dashboard downloads. |
 
