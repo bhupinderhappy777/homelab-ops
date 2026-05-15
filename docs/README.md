@@ -99,4 +99,4 @@ Create the tunnel and routes in Cloudflare Zero Trust. Ansible installs `cloudfl
 | Deep deploy and OCI restore | [docker/DEPLOYMENT.md](../docker/DEPLOYMENT.md) |
 | Adding a stack | [docker/ADDING_SERVICE.md](../docker/ADDING_SERVICE.md) |
 | Ansible details | [ansible/README-ansible.md](../ansible/README-ansible.md) |
-| Security | [SECURITY.md](../SECURITY.md) |
+| Monitoring smoke tests | [docker/MONITORING_VALIDATION.md](../docker/MONITORING_VALIDATION.md) |

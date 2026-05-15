@@ -17,6 +17,10 @@ The same playbook wires **nightly OCI restic backups** (`docker_backup_cron`) an
 
 Cloudflare Tunnel is not a Compose stack here: Ansible installs the `cloudflared` systemd service from a Key Vault–backed token.
 
+## Monitoring
+
+Grafana dashboards are **file-provisioned** from `stacks/monitoring/grafana/provisioning/dashboards/` (refresh IDs with `stacks/monitoring/download-dashboards.sh`, then commit). After deploy, smoke-test with [MONITORING_VALIDATION.md](MONITORING_VALIDATION.md).
+
 ## Adding a new service
 
 Use [ADDING_SERVICE.md](ADDING_SERVICE.md) for the end-to-end workflow.
@@ -26,7 +30,7 @@ A new service is only complete when:
 - its compose file exists,
 - Ansible creates its bind mounts,
 - Ansible deploys it,
-- backup/restore behavior is decided.
+- backup/restore behavior is decided,
 - [docker/DEPLOYMENT.md](DEPLOYMENT.md) is updated if tunnel routes or notable ports change.
 
 ## Updating stack versions

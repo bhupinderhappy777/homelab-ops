@@ -10,7 +10,7 @@ The automation and Compose bind mounts are written for **Ubuntu Server** with **
 |------|------|
 | `terraform/` | Azure resource group, VNet, subnet, NSG, public IP, NIC, Linux VM (Spot-capable), optional Key Vault resources for lab use. |
 | `ansible/` | Playbooks, inventory, `vars/homelab_public.yml` (committed defaults), roles: Key Vault facts, **Ubuntu/Debian** OS hardening (`security_hardening`), Docker Engine, data dirs, stack deploy, backup cron, restore, tunnel, Tailscale. |
-| `docker/stacks/` | One directory per Compose project; cloned/checked out on the VM under `/opt/homelab/docker_stacks/docker/stacks/`. |
+| `docker/stacks/` | One directory per Compose project; cloned/checked out on the VM under `/opt/homelab/docker_stacks/docker/stacks/`. Monitoring includes Grafana dashboard JSON in git under `docker/stacks/monitoring/grafana/provisioning/dashboards/`. |
 | `docker/scripts/` | `backup.sh`, `restore.sh`, etc.; copied to the VM by Ansible. |
 
 ## Where things run

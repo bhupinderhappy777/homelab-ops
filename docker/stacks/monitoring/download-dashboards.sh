@@ -11,7 +11,7 @@ DIR="$(cd "$(dirname "$0")/grafana/provisioning/dashboards" && pwd)"
 
 DASHBOARDS=(
   1860   # Node Exporter Full
-  14282  # cAdvisor / Docker
+  14282  # Docker / containers (community dashboard)
   13639  # Loki / Promtail
 )
 
