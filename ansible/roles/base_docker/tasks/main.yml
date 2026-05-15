@@ -69,39 +69,6 @@
     state: started
     enabled: yes
 
-- name: Check if AWS CLI v2 is already installed
-  ansible.builtin.stat:
-    path: /usr/local/bin/aws
-  register: homelab_aws_cli_stat
-
-- name: Install AWS CLI v2 bundle (download, unpack, install, cleanup)
-  when: not homelab_aws_cli_stat.stat.exists
-  block:
-    - name: Download AWS CLI v2 for OCI Object Storage
-      ansible.builtin.get_url:
-        url: "https://awscli.amazonaws.com/awscli-exe-linux-{{ 'aarch64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}.zip"
-        dest: /tmp/awscliv2.zip
-
-    - name: Unpack AWS CLI v2 bundle
-      ansible.builtin.unarchive:
-        src: /tmp/awscliv2.zip
-        dest: /tmp
-        remote_src: yes
-        creates: /tmp/aws/install
-
-    - name: Install AWS CLI v2 for S3-compatible backups
-      ansible.builtin.command: /tmp/aws/install --update
-      args:
-        creates: /usr/local/bin/aws
-
-    - name: Clean up AWS CLI bundle
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - /tmp/awscliv2.zip
-        - /tmp/aws
-
 - name: Set vm.max_map_count for Elasticsearch (Immich)
   ansible.posix.sysctl:
     name: vm.max_map_count
