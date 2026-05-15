@@ -22,7 +22,7 @@ Read [variables.tf](variables.tf) and [terraform.tfvars.example](terraform.tfvar
 
 ## Outputs
 
-Use the **public IP** (and `admin_username`) for [ansible/inventory/hosts.ini](../ansible/inventory/hosts.ini).
+Use the **public IP** (and `admin_username`) in `ansible/inventory/hosts.ini` (copy from [ansible/inventory/hosts.ini.example](../ansible/inventory/hosts.ini.example)).
 
 ## Operational notes
 

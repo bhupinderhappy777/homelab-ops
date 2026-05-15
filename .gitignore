@@ -20,6 +20,7 @@ terraform.auto.tfvars
 ansible/vars/secrets.yml
 ansible/scripts/seed_keyvault_hardcoded.local.sh
 ansible/scripts/seed_keyvault_from_env.local.sh
+ansible/inventory/hosts.ini
 *.retry
 .vault_pass
 vault_pass.txt

@@ -4,7 +4,7 @@ This repository is intended as a **template** for a personal homelab. Treat it l
 
 ## Secrets and Git
 
-- **Never commit** real credentials: use **Azure Key Vault** (recommended: resource group `vault-rg`) and gitignored files (`terraform.tfvars`, `docker/.env`, `ansible/vars/secrets.yml`, repo-root `secrets.yml`).
+- **Never commit** real credentials: use **Azure Key Vault** (recommended: resource group `vault-rg`) and gitignored files (`terraform.tfvars`, `docker/.env`, `ansible/vars/secrets.yml`, `ansible/inventory/hosts.ini`, repo-root `secrets.yml`). Use [ansible/inventory/hosts.ini.example](ansible/inventory/hosts.ini.example) as the inventory template.
 - If any secret was ever committed or pushed, **rotate it** everywhere it was used (Key Vault, cloud APIs, DB passwords, tunnel tokens, OCI keys, etc.). Removing files from a later commit does **not** erase them from old SHAs on remotes or forks.
 - Enable [GitHub secret scanning](https://docs.github.com/en/code-security/secret-scanning) and **push protection** on the repository when possible.
 

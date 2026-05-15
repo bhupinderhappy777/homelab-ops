@@ -1,0 +1,4 @@
+# Copy to hosts.ini (gitignored) and set your VM public IP and Terraform admin_username.
+#   cp ansible/inventory/hosts.ini.example ansible/inventory/hosts.ini
+[azure_vm]
+<your-vm-public-ip> ansible_user=<your-admin-username>

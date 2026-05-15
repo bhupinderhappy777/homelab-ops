@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform fmt & validate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
+      - name: Terraform format (check only)
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init (no backend)
+        run: terraform init -backend=false -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+  ansible:
+    name: Ansible syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ansible and collections
+        run: |
+          pip install --user "ansible-core>=2.14"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          cd ansible && ansible-galaxy collection install -r requirements.yml
+
+      - name: Syntax check deploy-homelab
+        working-directory: ansible
+        run: ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i ../.github/inventory-syntax.ini playbooks/deploy-homelab.yml --syntax-check
+
+      - name: Syntax check server playbook
+        working-directory: ansible
+        run: ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i ../.github/inventory-syntax.ini playbooks/server.yml --syntax-check

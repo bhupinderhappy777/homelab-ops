@@ -29,14 +29,20 @@ Non-secret defaults live in committed `vars/homelab_public.yml` (URLs, branch na
 
 ## Inventory
 
-Update [inventory/hosts.ini](inventory/hosts.ini):
+Copy the example inventory, then edit it (this file is **gitignored**; do not commit real IPs in a public repo):
+
+```bash
+cp inventory/hosts.ini.example inventory/hosts.ini
+```
+
+[inventory/hosts.ini.example](inventory/hosts.ini.example):
 
 ```ini
 [azure_vm]
-<public-ip-address> ansible_user=<username>
+<your-vm-public-ip> ansible_user=<your-admin-username>
 ```
 
-`<username>` must match the Terraform `admin_username` used when the VM was created.
+`<your-admin-username>` must match the Terraform `admin_username` used when the VM was created.
 
 ## Secrets (Azure Key Vault in `vault-rg`)
 
