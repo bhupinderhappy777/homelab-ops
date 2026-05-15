@@ -16,7 +16,7 @@ Terraform, Ansible, and Docker Compose for a production-style **Azure** homelab:
 | **Observability** | Prometheus, Grafana (dashboards file-provisioned from `docker/stacks/monitoring/grafana/provisioning/dashboards/`), Loki, and Promtail under `docker/stacks/monitoring`. |
 | **Quality gates** | GitHub Actions: `terraform fmt -check`, `terraform validate`, and `ansible-playbook --syntax-check` on every push to `main`. |
 
-For step-by-step operations, see **[docs/README.md](docs/README.md)**. Repository layout and data flow: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
+For step-by-step operations, see **[docs/README.md](docs/README.md)**. Repository layout and data flow: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. External services and tooling: **[docs/DEPENDENCIES.md](docs/DEPENDENCIES.md)**.
 
 ## Quick links
 
@@ -24,6 +24,7 @@ For step-by-step operations, see **[docs/README.md](docs/README.md)**. Repositor
 |----------|---------|
 | [docs/README.md](docs/README.md) | Operator runbook (Terraform → Key Vault → Ansible → backups) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Directory layout and controller vs VM responsibilities |
+| [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md) | Azure, OCI, Cloudflare, Tailscale, registries, and tooling |
 | [terraform/README-tf.md](terraform/README-tf.md) | Variables and `terraform apply` |
 | [docker/DEPLOYMENT.md](docker/DEPLOYMENT.md) | Playbook role order, tunnel port map, OCI restore |
 | [docker/MONITORING_VALIDATION.md](docker/MONITORING_VALIDATION.md) | Smoke tests for the monitoring stack |

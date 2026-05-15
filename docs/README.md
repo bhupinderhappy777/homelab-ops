@@ -100,3 +100,4 @@ Create the tunnel and routes in Cloudflare Zero Trust. Ansible installs `cloudfl
 | Adding a stack | [docker/ADDING_SERVICE.md](../docker/ADDING_SERVICE.md) |
 | Ansible details | [ansible/README-ansible.md](../ansible/README-ansible.md) |
 | Monitoring smoke tests | [docker/MONITORING_VALIDATION.md](../docker/MONITORING_VALIDATION.md) |
+| External services and tooling | [DEPENDENCIES.md](DEPENDENCIES.md) |

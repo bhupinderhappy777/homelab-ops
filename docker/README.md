@@ -1,5 +1,7 @@
 This folder contains Docker Compose stacks and scripts deployed through Ansible.
 
+Third-party services and network dependencies (registries, OCI, Cloudflare, etc.) are summarized in **[../docs/DEPENDENCIES.md](../docs/DEPENDENCIES.md)**.
+
 ## Overview
 
 1. `stacks/` contains `compose.yml` for each self-hosted service.
