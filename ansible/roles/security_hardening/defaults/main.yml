@@ -10,9 +10,3 @@ security_hardening_verify_only: false
 security_hardening_ssh_port: 22
 security_hardening_permit_root_login: "no"
 security_hardening_password_auth: "no"
-
-# Windows settings
-security_hardening_windows_rdp_enabled: false
-security_hardening_windows_allowed_ports:
-  - 5985
-  - 5986

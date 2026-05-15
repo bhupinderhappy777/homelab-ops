@@ -9,7 +9,7 @@ The automation and Compose bind mounts are written for **Ubuntu Server** with **
 | Path | Role |
 |------|------|
 | `terraform/` | Azure resource group, VNet, subnet, NSG, public IP, NIC, Linux VM (Spot-capable), optional Key Vault resources for lab use. |
-| `ansible/` | Playbooks, inventory, `vars/homelab_public.yml` (committed defaults), roles: Key Vault facts, hardening, Docker/Podman, data dirs, stack deploy, backup cron, restore, tunnel, Tailscale, chezmoi. |
+| `ansible/` | Playbooks, inventory, `vars/homelab_public.yml` (committed defaults), roles: Key Vault facts, **Linux-only** OS hardening (`security_hardening` for RedHat/Debian), Docker/Podman, data dirs, stack deploy, backup cron, restore, tunnel, Tailscale, chezmoi. |
 | `docker/stacks/` | One directory per Compose project; cloned/checked out on the VM under `/opt/homelab/docker_stacks/docker/stacks/`. |
 | `docker/scripts/` | `backup.sh`, `restore.sh`, etc.; copied to the VM by Ansible. |
 
@@ -34,4 +34,4 @@ The automation and Compose bind mounts are written for **Ubuntu Server** with **
 - **Secrets:** Application and backup credentials are loaded at deploy time from Key Vault, not embedded in committed Compose env files.
 - **Lifecycle:** With secrets in `vault-rg`, compute can be reprovisioned without losing centrally stored secrets.
 - **Automation:** Ansible roles are intended to be reapplied safely; backup and restore scripts support recovery flows documented under `docker/`.
-- **Exposure:** Baseline OS hardening, configurable SSH source restriction, tunnel-first exposure for web UIs, optional mesh access via Tailscale.
+- **Exposure:** Baseline Linux OS hardening (no Windows targets in this repo), configurable SSH source restriction, tunnel-first exposure for web UIs, optional mesh access via Tailscale.
