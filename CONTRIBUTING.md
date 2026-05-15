@@ -19,3 +19,27 @@ ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/d
 ```
 
 CI runs Terraform fmt/validate and Ansible syntax checks on push and pull requests to `main` (using a placeholder inventory under `.github/`).
+
+## Cleaning local build caches
+
+Avoid `git clean -fdX` at the repo root: it removes **all** gitignored *untracked* paths, including `ansible/inventory/hosts.ini`, `docker/.env`, `secrets.yml`, `terraform/terraform.tfvars`, and `terraform/*.tfstate*` if present.
+
+To drop only disposable caches (safe):
+
+```bash
+rm -rf terraform/.terraform .ansible __pycache__
+find . -type d -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
+```
+
+Dry-run a broader clean while **keeping** operator-local files (requires Git 2.31+ for repeated `-e`):
+
+```bash
+git clean -fdXn \
+  -e ansible/inventory/hosts.ini \
+  -e docker/.env \
+  -e secrets.yml \
+  -e terraform/terraform.tfvars \
+  -e 'terraform/terraform.tfstate*'
+```
+
+Remove `-n` after you confirm the list.

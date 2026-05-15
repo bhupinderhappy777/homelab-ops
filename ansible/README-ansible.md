@@ -5,7 +5,7 @@ Operator walkthrough: **[docs/README.md](../docs/README.md)**.
 Ansible is responsible for:
 
 - loading secrets from **Azure Key Vault** into play scope (`keyvault_secrets` role)
-- applying baseline Linux hardening
+- applying baseline **Linux-only** hardening (`security_hardening`; RedHat/Debian families)
 - installing the container runtime, `restic`, and OCI backup helpers
 - creating `/opt/homelab` directories
 - rendering `/opt/homelab/docker_stacks/docker/.env` from Key Vault–backed facts
