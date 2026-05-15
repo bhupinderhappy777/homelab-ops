@@ -1,6 +1,6 @@
 ---
 - name: Deploy Complete Homelab Pipeline
-  hosts: azure_vm # From inventory/hosts.ini
+  hosts: azure_vm # inventory: copy inventory/hosts.ini.example to hosts.ini (gitignored)
   become: yes
   vars_files:
     - ../vars/homelab_public.yml

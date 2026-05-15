@@ -24,3 +24,10 @@
 
 - NSG allows SSH from `var.ssh_allowed_cidr`.
 - Application access is typically via **Cloudflare Tunnel** (HTTPS to Cloudflare → tunnel → localhost ports on VM) and/or **Tailscale**.
+
+## Design practices
+
+- **Secrets:** Application and backup credentials are loaded at deploy time from Key Vault, not embedded in committed Compose env files.
+- **Lifecycle:** With secrets in `vault-rg`, compute can be reprovisioned without losing centrally stored secrets.
+- **Automation:** Ansible roles are intended to be reapplied safely; backup and restore scripts support recovery flows documented under `docker/`.
+- **Exposure:** Baseline OS hardening, configurable SSH source restriction, tunnel-first exposure for web UIs, optional mesh access via Tailscale.

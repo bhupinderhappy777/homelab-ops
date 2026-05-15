@@ -16,7 +16,13 @@ terraform apply
 
 ## 2. Update Ansible inventory
 
-Set the host IP and SSH user in [ansible/inventory/hosts.ini](../ansible/inventory/hosts.ini):
+Copy the example and set your VM address and SSH user:
+
+```bash
+cp ansible/inventory/hosts.ini.example ansible/inventory/hosts.ini
+```
+
+Edit `ansible/inventory/hosts.ini`:
 
 ```ini
 [azure_vm]

@@ -1,6 +1,6 @@
 # Operations guide
 
-Single path from empty subscription to a running homelab. Terraform creates compute; secrets live in Azure Key Vault (`vault-rg`); Ansible configures the VM, deploys Compose stacks, backups, and tunnel.
+Authoritative runbook from an empty subscription to a running homelab: Terraform provisions compute; secrets live in Azure Key Vault (`vault-rg`); Ansible configures the VM, deploys Compose stacks, schedules backups, and installs the tunnel agent.
 
 ## Prerequisites
 
@@ -22,14 +22,20 @@ See [terraform/README-tf.md](../terraform/README-tf.md) for variables, NSG/SSH, 
 
 ## 2. Ansible inventory
 
-Edit [ansible/inventory/hosts.ini](../ansible/inventory/hosts.ini):
+Create a local inventory file (gitignored) from the example:
+
+```bash
+cp ansible/inventory/hosts.ini.example ansible/inventory/hosts.ini
+```
+
+Edit `ansible/inventory/hosts.ini`:
 
 ```ini
 [azure_vm]
-<PUBLIC_IP> ansible_user=<admin_username>
+<your-vm-public-ip> ansible_user=<your-admin-username>
 ```
 
-`ansible_user` must match Terraform `admin_username`.
+`ansible_user` must match Terraform `admin_username`. Do not commit `hosts.ini` if it contains production addresses in a public repository.
 
 ## 3. Azure Key Vault (`vault-rg`)
 
@@ -90,7 +96,7 @@ ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i inventory/hosts.ini playbooks/d
   -e migration_restore_archive_dir=/path/to/export
 ```
 
-Tags: `keyvault`, `security`, `base`, `docker`, `stacks`, `backup`, `backup_restore`, `tunnel`, `tailscale`, `chezmoi` (not used by `deploy-homelab.yml`).
+Common Ansible tags on `deploy-homelab.yml`: `keyvault`, `security`, `base`, `docker`, `directories`, `stacks`, `backup`, `backup_restore`, `tunnel`, `tailscale`. The `chezmoi` tag applies to [server.yml](../ansible/playbooks/server.yml), not the homelab VM deploy playbook.
 
 ## 6. Cloudflare Tunnel
 
