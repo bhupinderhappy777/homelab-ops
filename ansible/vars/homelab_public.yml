@@ -6,5 +6,4 @@ docker_stacks_branch: main
 # run `ssh-add` on your laptop so the key that can read this repo is loaded before ansible-playbook.
 # For a public repo only, you can use https://github.com/USER/homelab-ops.git instead (no agent).
 docker_stacks_repo_url: git@github.com:bhupinderhappy777/homelab-ops.git
-dotfiles_repo: git@github.com:bhupinderhappy777/dotfiles.git
 oci_s3_region: ca-toronto-1

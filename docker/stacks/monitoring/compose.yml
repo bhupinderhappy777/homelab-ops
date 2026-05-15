@@ -36,7 +36,7 @@ services:
 
     volumes:
     - /opt/homelab/data/prometheus/data:/prometheus
-    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro,z
+    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
     networks:
     - monitoring_network
@@ -67,7 +67,6 @@ services:
 
     restart: unless-stopped
   grafana:
-    # Match community dashboard exports (e.g. Node Exporter 1860: schemaVersion 41, Grafana 11.6.x)
     image: docker.io/grafana/grafana:11.6.1
     hostname: grafana
     user: '472:472'
@@ -77,11 +76,7 @@ services:
 
     volumes:
     - /opt/homelab/data/grafana/data:/var/lib/grafana
-    - ./grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro,z
-    - ./grafana/provisioning/dashboards/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro,z
-    - ./grafana/provisioning/dashboards/1860.json:/etc/grafana/dashboards-json/1860.json:ro,z
-    - ./grafana/provisioning/dashboards/14282.json:/etc/grafana/dashboards-json/14282.json:ro,z
-    - ./grafana/provisioning/dashboards/13639.json:/etc/grafana/dashboards-json/13639.json:ro,z
+    - ./grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
 
     environment:
       GF_SERVER_ROOT_URL: '${GRAFANA_ROOT_URL}'
@@ -120,7 +115,7 @@ services:
 
     volumes:
     - /opt/homelab/data/loki/data:/loki
-    - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro,z
+    - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro
 
     networks:
     - monitoring_network
@@ -150,7 +145,7 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - /var/lib/docker/containers:/var/lib/docker/containers:ro
     - /var/log:/var/log:ro
-    - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro,z
+    - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
 
     networks:
     - monitoring_network

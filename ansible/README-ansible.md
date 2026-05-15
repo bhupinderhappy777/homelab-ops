@@ -48,19 +48,17 @@ cp inventory/hosts.ini.example inventory/hosts.ini
 
 All `vault_*` variables are read from Key Vault; name mapping is in [roles/keyvault_secrets/defaults/main.yml](roles/keyvault_secrets/defaults/main.yml).
 
-**Full procedure:** [docs/README.md](../docs/README.md) (vault in `vault-rg`, exports, YAML import vs `.env` seed).
+**Full procedure:** [docs/README.md](../docs/README.md) (vault in `vault-rg`, exports, `az keyvault secret set`).
 
 Quick reference from **repository root**:
 
 ```bash
 export AZURE_KEY_VAULT_NAME='<your-vault-name>'
 export AZURE_KEY_VAULT_URI="$(az keyvault show -g vault-rg -n "$AZURE_KEY_VAULT_NAME" --query properties.vaultUri -o tsv)"
-python3 ansible/scripts/import_vars_yaml_to_keyvault.py /path/to/local-secrets.yaml
-# or seed from docker/.env:
-./ansible/scripts/seed_keyvault_hardcoded.example.sh
+az keyvault secret set --vault-name "$AZURE_KEY_VAULT_NAME" --name "grafana-password" --value "$(openssl rand -hex 16)"
 ```
 
-Copy [docker/.env.example](../docker/.env.example) to `docker/.env` for the seed script. Only keys starting with `vault_` are uploaded by the Python importer.
+Copy [docker/.env.example](../docker/.env.example) to `docker/.env` (gitignored) when you need the same variable names locally for Compose experiments; Ansible still sources secrets from Key Vault on the deploy path.
 
 ## Run the deploy
 

@@ -7,12 +7,12 @@ restore paths are all accounted for.
 ## Workflow
 
 1. Create a new stack directory under `docker/stacks/<service-name>/`.
-2. Add `compose.yml`.
-3. Add `explanation.md`.
-4. Add any config files that the stack mounts from the repo.
-5. Add required bind-mount directories to the Ansible directory role.
-6. Add the stack to the Ansible deploy order.
-7. Decide whether the stack should be included in backup and restore.
+2. Add `compose.yml` (pin images, document ports and data paths in comments where helpful).
+3. Add any config files that the stack mounts from the repo.
+4. Add required bind-mount directories to the Ansible directory role.
+5. Add the stack to the Ansible deploy order.
+6. Decide whether the stack should be included in backup and restore.
+7. Update [docker/DEPLOYMENT.md](DEPLOYMENT.md) if the service has a tunnel hostname or notable port.
 8. Test deploy syntax and the stack health locally or on the target host.
 
 ## 1. Compose File
@@ -27,18 +27,7 @@ Guidelines:
 - Add a healthcheck if the image supports one reliably.
 - Use the shared `.env` variables only when the service truly needs them.
 
-## 2. Explanation File
-
-Create `docker/stacks/<service-name>/explanation.md` with:
-
-- location
-- compose file path
-- host data paths
-- access ports
-- production notes
-- backup/restore notes if special
-
-## 3. Directory Creation In Ansible
+## 2. Directory creation in Ansible
 
 Update:
 
@@ -54,7 +43,7 @@ Examples:
 - Paperless Redis data uses `999:999`
 - Monitoring data uses service-specific ownership
 
-## 4. Add The Stack To Deployment
+## 3. Add the stack to deployment
 
 Update:
 
@@ -70,7 +59,7 @@ Include the expected compose network name and compose network label.
 Deploy order matters when a stack depends on external networks created by other
 stacks.
 
-## 5. Backup And Restore Decision
+## 4. Backup and restore decision
 
 For every new service, decide one of these models:
 
@@ -112,7 +101,7 @@ Current example:
 
 - `portainer_data` is intentionally excluded from automated restore
 
-## 6. Cloudflare Tunnel
+## 5. Cloudflare Tunnel
 
 If the service is public, configure the route in the Cloudflare dashboard.
 
@@ -121,7 +110,7 @@ It only runs the `cloudflared` system service from the tunnel token.
 
 The public hostname should route to the host-published local port.
 
-## 7. Validation
+## 6. Validation
 
 At minimum run:
 
@@ -144,14 +133,11 @@ On a target host, verify:
 - local HTTP or TCP response
 - backup impact if new persistent data was added
 
-## 8. Update Docs
+## 7. Update docs
 
 When a new service is added, update at least:
 
-- `docker/README.md`
-- `docker/DEPLOYMENT.md` if the workflow changes
-- the stack `explanation.md`
+- [docker/README.md](README.md) if operator flow changes
+- [docker/DEPLOYMENT.md](DEPLOYMENT.md) if tunnel hostnames or notable ports change
 
-If the backup or restore model changed, also update:
-
-- `docker/BACKUP_STRATEGY.md`
+If the backup or restore model changed, also update [docker/BACKUP_STRATEGY.md](BACKUP_STRATEGY.md).

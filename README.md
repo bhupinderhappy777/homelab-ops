@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/bhupinderhappy777/homelab-ops/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bhupinderhappy777/homelab-ops/actions/workflows/ci.yml)
 
-Terraform, Ansible, and Docker Compose for a production-style **Azure** homelab: VM and networking as code, **Azure Key Vault** for secrets (`vault-rg`), **Cloudflare Tunnel** and **Tailscale** for access, **OCI Object Storage** with **restic** for backups, and a full observability stack (Prometheus, Grafana, Loki).
+Terraform, Ansible, and Docker Compose for a production-style **Azure** homelab: VM and networking as code, **Azure Key Vault** for secrets (`vault-rg` recommended for production secrets), **Cloudflare Tunnel** and **Tailscale** for access, **OCI Object Storage** with **restic** for backups, and metrics/logs via Prometheus, Grafana, Loki, and Promtail (`docker/stacks/monitoring`).
 
 ## Technical scope
 

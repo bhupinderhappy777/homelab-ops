@@ -47,7 +47,3 @@ jobs:
       - name: Syntax check deploy-homelab
         working-directory: ansible
         run: ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i ../.github/inventory-syntax.ini playbooks/deploy-homelab.yml --syntax-check
-
-      - name: Syntax check server playbook
-        working-directory: ansible
-        run: ANSIBLE_CONFIG=./ansible.cfg ansible-playbook -i ../.github/inventory-syntax.ini playbooks/server.yml --syntax-check
