@@ -5,7 +5,7 @@
 The unified monitoring stack includes:
 
 - **Prometheus**: Metrics collection and alerting (scrapes all services)
-- **Grafana**: Visualization and dashboarding (no dashboards are shipped in git; import or build in the UI)
+- **Grafana**: Visualization; baseline dashboards are **file-provisioned** from `docker/stacks/monitoring/grafana/provisioning/dashboards/` (refresh with `download-dashboards.sh`, then commit)
 - **Loki**: Log aggregation
 - **Promtail**: Log shipper with Docker service discovery
 - **node-exporter**: Host system metrics
@@ -90,7 +90,7 @@ Check the app container is running (`docker ps`), DNS names in Prometheus config
 - [ ] Grafana `/api/health` returns 200
 - [ ] Loki `/ready` returns 200
 - [ ] Promtail logs show container discovery
-- [ ] Grafana shows data sources (dashboards are optional; add in UI or import by ID)
+- [ ] Grafana shows data sources and the **Homelab** folder dashboards (from git provisioning)
 
 ## Cleanup
 
