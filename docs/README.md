@@ -32,10 +32,12 @@ Edit `ansible/inventory/hosts.ini`:
 
 ```ini
 [azure_vm]
-<your-vm-public-ip> ansible_user=<your-admin-username>
+<your-vm-public-ip> ansible_user=deployuser
 ```
 
-`ansible_user` must match Terraform `admin_username`. Do not commit `hosts.ini` if it contains production addresses in a public repository.
+`ansible_user` must match Terraform `admin_username` (see `terraform apply` output `admin_username`; default is `deployuser`). Do not commit `hosts.ini` if it contains production addresses in a public repository.
+
+If SSH or Ansible fails with **Permission denied (publickey)**: you are probably using the wrong Linux user (for example your laptop username instead of `deployuser`) or the wrong private key. Use the key pair whose **public** half Terraform was configured with (`ssh_public_key` or `ssh_public_key_path`), for example `ssh -i ~/.ssh/homelab_azure deployuser@<public-ip>` when the default path was used.
 
 ## 3. Azure Key Vault (`vault-rg`)
 

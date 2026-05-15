@@ -38,10 +38,10 @@ cp inventory/hosts.ini.example inventory/hosts.ini
 
 ```ini
 [azure_vm]
-<your-vm-public-ip> ansible_user=<your-admin-username>
+<your-vm-public-ip> ansible_user=deployuser
 ```
 
-`<your-admin-username>` must match the Terraform `admin_username` used when the VM was created.
+`ansible_user` must match Terraform `admin_username` when the VM was created (default `deployuser`). Use Ansible’s `-e ansible_ssh_private_key_file=...` or `ssh-agent` so the private key matches the public key passed to Terraform.
 
 ## Secrets (Azure Key Vault in `vault-rg`)
 
