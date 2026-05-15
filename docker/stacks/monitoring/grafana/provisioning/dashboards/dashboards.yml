@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: default
+    orgId: 1
+    folder: Homelab
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    options:
+      # Dashboards are mounted here via compose configs
+      path: /etc/grafana/dashboards-json

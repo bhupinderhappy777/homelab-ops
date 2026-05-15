@@ -1,0 +1,60 @@
+version: '3.8'
+
+# --- 2. SERVICES SECTION ---
+services:
+  ## POSTGRES DATABASE ##
+  postgres:
+    image: docker.io/library/postgres:15
+    hostname: postgres
+    networks:
+    - docuseal_network
+    restart: unless-stopped
+
+    volumes:
+    - /opt/homelab/data/docuseal_postgres/_data:/var/lib/postgresql/data:Z
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '${DOCUSEAL_POSTGRES_PASSWORD}'
+      POSTGRES_DB: 'docuseal'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  ## DOCUSEAL APPLICATION (app) ##
+  app:
+    image: docker.io/docuseal/docuseal:latest
+    hostname: app
+    networks:
+    - docuseal_network
+    restart: unless-stopped
+
+    ports:
+    - "3003:3000"
+
+    volumes:
+    - /opt/homelab/data/docuseal_data:/data/docuseal:Z
+    environment:
+        # Use service name 'postgres' for the host
+      DATABASE_URL: 'postgresql://postgres:${DOCUSEAL_POSTGRES_PASSWORD}@postgres:5432/docuseal'
+      HOST: '${DOCUSEAL_HOST}'
+        # FORCE_SSL is commented out, as requested
+    healthcheck:
+        # 🛑 DISABLED: Allows the service to run even if the healthcheck fails after startup.
+      disable: true
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+networks:
+  docuseal_network:
+    driver: bridge

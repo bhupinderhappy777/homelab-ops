@@ -1,0 +1,18 @@
+---
+# Fedora / Oracle Linux (RedHat Family)
+- name: Allow SSH in firewalld
+  ansible.posix.firewalld:
+    service: ssh
+    permanent: true
+    state: enabled
+  when: ansible_facts['os_family'] == "RedHat"
+  notify: Reload firewalld
+
+# Ubuntu / Debian (Debian Family)
+- name: Allow SSH in UFW
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+    state: enabled
+  when: ansible_facts['os_family'] == "Debian"
+  notify: Reload ufw

@@ -1,0 +1,43 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+common:
+  # Let Loki pick the container IP for ring/gRPC. 127.0.0.1 can break multi-service
+  # Docker setups (writes can work while Grafana queries look empty).
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        # Keep small on low-RAM hosts (Loki also uses memory for ingesters)
+        max_size_mb: 32
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+limits_config:
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
+ruler:
+  alertmanager_url: http://localhost:9093

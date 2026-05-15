@@ -1,0 +1,51 @@
+# --- 2. SERVICES SECTION ---
+services:
+  pihole:
+    image: docker.io/pihole/pihole:latest
+
+    ports:
+      # DNS Ports: bind directly on host. The host must not have any other
+      # process listening on port 53.
+    - "53:53/tcp"
+    - "53:53/udp"
+
+      # Web Interface Port
+    - "8182:80"
+
+    environment:
+      # --- IMPORTANT: Custom Configuration ---
+      TZ: 'America/Vancouver'
+      FTLCONF_webserver_api_password: '${PIHOLE_PASSWORD}'
+      FTLCONF_dns_listeningMode: 'all'
+      PIHOLE_UID: '1000'
+      PIHOLE_GID: '1000'
+    volumes:
+      # Map the shared volumes to the two required Pi-hole subdirectories
+    - /opt/homelab/data/pihole_data/pihole:/etc/pihole:Z
+    - /opt/homelab/data/pihole_data/dnsmasq.d:/etc/dnsmasq.d:Z
+    cap_add:
+    - NET_ADMIN
+    - SYS_NICE
+    - SYS_TIME
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "dig", "+short", "+norecurse", "+retry=0", "@127.0.0.1", "pi.hole"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+    - pihole_network
+
+# --- 3. NETWORKS SECTION ---
+networks:
+  pihole_network:
+    driver: bridge

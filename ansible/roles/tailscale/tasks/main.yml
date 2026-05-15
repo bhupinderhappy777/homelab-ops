@@ -1,0 +1,6 @@
+---
+- name: Install Tailscale Package
+  ansible.builtin.include_tasks: install.yml
+
+- name: Configure and Authenticate
+  ansible.builtin.include_tasks: configure.yml

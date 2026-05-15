@@ -1,0 +1,12 @@
+---
+- name: Linux - ensure home directories have safe permissions
+  ansible.builtin.file:
+    path: "/home"
+    state: directory
+    mode: "0755"
+  when:
+    - ansible_facts['os_family'] in ['RedHat', 'Debian']
+    - not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:filesystem

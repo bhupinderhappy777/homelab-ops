@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: "Your Name"
+  description: Manage dotfiles via chezmoi
+  company: "Your Company"
+  license: "MIT"
+  min_ansible_version: "2.9"
+  galaxy_tags:
+    - dotfiles
+    - chezmoi
+
+dependencies: []

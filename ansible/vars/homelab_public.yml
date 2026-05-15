@@ -1,0 +1,22 @@
+---
+# Non-secret defaults (safe to commit). Override via inventory group_vars or -e extra_vars.
+admin_username: deployuser
+homelab_container_runtime: docker
+docker_stacks_branch: main
+# Git URL for /opt/homelab/docker_stacks. SSH + agent forwarding: ansible.cfg has ForwardAgent=yes;
+# run `ssh-add` on your laptop so the key that can read this repo is loaded before ansible-playbook.
+# For a public repo only, you can use https://github.com/USER/homelab-ops.git instead (no agent).
+docker_stacks_repo_url: git@github.com:bhupinderhappy777/homelab-ops.git
+dotfiles_repo: ""  # your dotfiles repo URL, or --skip-tags chezmoi if unused
+oci_s3_region: ca-toronto-1
+
+# Public hostnames for generated docker/.env (override for your domain)
+docuseal_host: docuseal.example.com
+firefly_app_url: https://firefly.example.com
+grafana_root_url: http://grafana.example.com:3005
+monica_app_url: http://monica.example.com:8080
+n8n_webhook_url: https://n8n.example.com
+n8n_image: docker.io/n8nio/n8n:latest
+openwebui_url: https://openwebui.example.com
+paperless_url: https://paperless.example.com
+paperless_allowed_hosts: paperless.example.com,localhost,127.0.0.1

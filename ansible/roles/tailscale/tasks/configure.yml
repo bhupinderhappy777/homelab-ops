@@ -1,0 +1,35 @@
+---
+- name: Configure Tailscale | Check login status
+  ansible.builtin.command: tailscale status --json
+  register: tailscale_status_raw
+  failed_when: false
+  changed_when: false
+  become: true
+
+- name: Configure Tailscale | Parse status
+  ansible.builtin.set_fact:
+    tailscale_status: >-
+      {{
+        (tailscale_status_raw.rc == 0 and (tailscale_status_raw.stdout | length > 0))
+        | ternary(tailscale_status_raw.stdout | from_json, {})
+      }}
+
+- name: Configure Tailscale | Connect to Tailscale network
+  ansible.builtin.command:
+    cmd: "tailscale up --authkey={{ tailscale_auth_key }} --accept-routes --reset {{ tailscale_args }} --ssh"
+  when:
+    - tailscale_auth_key is defined
+    - tailscale_auth_key != ""
+    - tailscale_up | default(true) | bool
+    - tailscale_status.BackendState is not defined or tailscale_status.BackendState != 'Running'
+  register: tailscale_up_result
+  changed_when: false
+  no_log: true
+  become: true
+  async: 120
+  poll: 5
+
+- name: Configure Tailscale | Display IP address
+  ansible.builtin.debug:
+    msg: "Tailscale IP: {{ tailscale_status.Self.TailscaleIPs[0] | default('Not Found') }}"
+  when: tailscale_status.Self is defined

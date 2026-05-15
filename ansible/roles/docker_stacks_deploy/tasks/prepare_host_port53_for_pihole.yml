@@ -1,0 +1,50 @@
+---
+# Pi-hole Docker publishes host ports 53/tcp and 53/udp. Ubuntu's systemd-resolved stub
+# listens on 127.0.0.53:53 by default and can block binding. Disable the stub listener and
+# use /run/systemd/resolve/resolv.conf for host DNS until Pi-hole is up.
+- name: Check for systemd-resolved configuration
+  ansible.builtin.stat:
+    path: /etc/systemd/resolved.conf
+  register: homelab_resolved_conf
+
+- name: Disable systemd-resolved DNS stub listener (frees port 53 for Pi-hole)
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^#?DNSStubListener='
+    line: DNSStubListener=no
+    insertafter: '^\[Resolve\]'
+    mode: "0644"
+  register: homelab_resolved_stub_line
+  when: homelab_resolved_conf.stat.exists
+
+- name: Restart systemd-resolved after DNSStubListener change
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted
+  when: homelab_resolved_stub_line is defined and homelab_resolved_stub_line is changed
+
+- name: Stat /etc/resolv.conf after systemd-resolved changes
+  ansible.builtin.stat:
+    path: /etc/resolv.conf
+  register: homelab_etc_resolv
+
+- name: Point /etc/resolv.conf at upstream file (not stub) after disabling stub listener
+  ansible.builtin.file:
+    src: /run/systemd/resolve/resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+  when:
+    - homelab_etc_resolv.stat.exists | default(false)
+    - homelab_etc_resolv.stat.islnk | default(false)
+    - "'stub-resolv' in (homelab_etc_resolv.stat.lnk_target | default(''))"
+
+- name: Try stopping optional host DNS services that may hold port 53
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - dnsmasq
+    - named
+  failed_when: false

@@ -1,0 +1,30 @@
+---
+- name: Fail when both migration restore modes are requested
+  ansible.builtin.fail:
+    msg: "Set either migration_restore_archive_dir or backup_restore_snapshot, not both."
+  when:
+    - backup_restore_snapshot | length > 0
+    - migration_restore_archive_dir | default('') | length > 0
+
+- name: Ensure restic restore script is installed on host
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../docker/scripts/restore.sh"
+    dest: /opt/homelab/docker_stacks/docker/scripts/restore.sh
+    owner: root
+    group: root
+    mode: '0755'
+  when: backup_restore_snapshot | length > 0
+
+- name: Restore homelab data from OCI snapshot
+  ansible.builtin.command:
+    cmd: /opt/homelab/docker_stacks/docker/scripts/restore.sh {{ backup_restore_snapshot }}
+  environment:
+    CONTAINER_RUNTIME: "{{ homelab_container_runtime | default('docker') }}"
+  when: backup_restore_snapshot | length > 0
+
+- name: Restart stacks after OCI snapshot restore
+  ansible.builtin.command:
+    cmd: "{{ 'podman-compose' if (homelab_container_runtime | default('docker') | lower) == 'podman' else 'docker compose' }} --env-file /opt/homelab/docker_stacks/docker/.env up -d --remove-orphans"
+    chdir: "/opt/homelab/docker_stacks/docker/stacks/{{ item }}"
+  loop: "{{ backup_restore_stacks }}"
+  when: backup_restore_snapshot | length > 0

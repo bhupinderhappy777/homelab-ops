@@ -1,0 +1,145 @@
+version: '3.8'
+
+# --- 2. SERVICES SECTION ---
+services:
+
+  # ===========================================================================
+  # POSTGRESQL DATABASE
+  # ===========================================================================
+  db:
+    image: docker.io/library/postgres:16.2
+    hostname: paperless-db
+    networks:
+    - paperless_network
+    restart: unless-stopped
+
+    volumes:
+    - /opt/homelab/data/paperless_ngx/paperless_postgres:/var/lib/postgresql/data:Z
+    environment:
+      POSTGRES_USER: '${PAPERLESS_DB_USER}'         # ❗ CHANGE THIS
+      POSTGRES_PASSWORD: '${PAPERLESS_DB_PASSWORD}' # ❗ CHANGE THIS
+      POSTGRES_DB: 'paperless_db'
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperless_user -d paperless_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # REDIS CACHE
+  # ===========================================================================
+  redis:
+    image: docker.io/library/redis:latest
+    hostname: paperless-redis
+    networks:
+    - paperless_network
+    restart: unless-stopped
+
+    volumes:
+    - /opt/homelab/data/paperless_ngx/paperless_redis:/data:Z
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # PAPERLESS-NGX APPLICATION
+  # ===========================================================================
+  paperless-webserver:
+    # Keep in sync with applied DB migrations (django-auditlog 3.x / Django 5). Older
+    # images (e.g. 2.6.x) against a DB migrated by a newer release cause IntegrityError
+    # on auditlog_logentry.changes_text and documents_paperlesstask.type.
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.20.13
+    hostname: paperless-webserver
+    networks:
+    - paperless_network
+    restart: unless-stopped
+
+    depends_on:
+    - db
+    - redis
+
+    ports:
+    - "8001:8000"
+
+    volumes:
+    - /opt/homelab/data/paperless_ngx/paperless_consume:/usr/src/paperless/consume:Z
+    - /opt/homelab/data/paperless_ngx/paperless_media:/usr/src/paperless/media:Z
+    - /opt/homelab/data/paperless_ngx/paperless_data:/usr/src/paperless/data:Z
+    - /opt/homelab/data/paperless_ngx/paperless_export:/usr/src/paperless/export:Z
+    environment:
+      # Database configuration
+      PAPERLESS_DBHOST: 'db'
+      PAPERLESS_DBPORT: '5432'
+      PAPERLESS_DBNAME: 'paperless_db'
+      PAPERLESS_DBUSER: '${PAPERLESS_DB_USER}'      # ❗ CHANGE THIS (must match db service)
+      PAPERLESS_DBPASS: '${PAPERLESS_DB_PASSWORD}'  # ❗ CHANGE THIS (must match db service)
+      PAPERLESS_DBENGINE: 'django.db.backends.postgresql'
+      PAPERLESS_AUDIT_LOG_ENABLED: 'true'
+      PAPERLESS_TASK_WORKERS: '1'           # Keep workers but...
+      PAPERLESS_THREADS_PER_WORKER: '1'     # Reduce threads
+      PAPERLESS_INDEX_TASK_WORKERS: '0'     # Disable automatic indexing
+      # Redis configuration
+      PAPERLESS_REDIS: 'redis://redis:6379/0'
+
+      # OCR configuration (safe quality improvements for *new* documents)
+      # - Keep OCR_MODE=skip so we don't re-OCR existing PDFs / change archived files.
+      # - Rotate/deskew remain enabled; do NOT add "osd" to OCR_LANGUAGE (tesseract
+      #   treats it as internal-only and will error).
+      PAPERLESS_OCR_MODE: 'skip'
+      PAPERLESS_OCR_LANGUAGE: 'eng'
+      PAPERLESS_OCR_LANGUAGES: 'eng'
+      PAPERLESS_OCR_CLEAN: 'clean-final'
+      PAPERLESS_OCR_DESKEW: 'true'
+      PAPERLESS_OCR_ROTATE_PAGES: 'true'
+      PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: '9'
+      PAPERLESS_OCR_IMAGE_DPI: '300'
+      PAPERLESS_OCR_USER_ARGS: '{"optimize": 3}'
+
+      # Application configuration
+      PAPERLESS_URL: '${PAPERLESS_URL}'
+      PAPERLESS_CSRF_TRUSTED_ORIGINS: '${PAPERLESS_URL}'
+      PAPERLESS_ALLOWED_HOSTS: '${PAPERLESS_ALLOWED_HOSTS}'
+      PAPERLESS_ENABLE_HTTP_REMOTE_USER: 'true'
+      PAPERLESS_SKIP_MIGRATIONS: 'false'
+
+      # Consumer configuration
+      PAPERLESS_CONSUMER_POLLING: '10'
+      PAPERLESS_CONSUMER_RECURSIVE: 'true'
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: 'true'
+
+      # User mapping
+      USERMAP_UID: '1002'
+      USERMAP_GID: '1002'
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# --- 3. NETWORKS SECTION ---
+networks:
+  paperless_network:
+    driver: bridge

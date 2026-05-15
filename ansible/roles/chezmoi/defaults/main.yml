@@ -1,0 +1,11 @@
+---
+chezmoi_user: "{{ ansible_user_id }}"
+chezmoi_home: "{{ lookup('env', 'HOME') }}"
+chezmoi_repo: "{{ clone_dotfiles_repo | default('') }}"
+chezmoi_branch: "{{ clone_dotfiles_branch | default('main') }}"
+chezmoi_source_path: "{{ chezmoi_home }}/.local/share/chezmoi"
+chezmoi_install_package: true
+chezmoi_force_apply: false
+chezmoi_force_source_init: false
+chezmoi_fix_systemd_ownership: false
+chezmoi_patch_plasma_scripts: false

@@ -1,0 +1,77 @@
+version: '3.8'
+
+# --- 2. SERVICES SECTION ---
+services:
+  ## MYSQL DATABASE ##
+  db:
+    image: docker.io/library/mariadb:11
+    hostname: monica-db
+
+    volumes:
+    - /opt/homelab/data/monica/db:/var/lib/mysql:Z
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MONICA_DB_PASSWORD}'
+      MYSQL_DATABASE: 'monica'
+      MYSQL_USER: 'monica'
+      MYSQL_PASSWORD: '${MONICA_DB_PASSWORD}'
+    networks:
+    - monica_network
+
+    restart: unless-stopped
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  app:
+    image: docker.io/library/monica:4.1.2-apache  # Pinned version for stability
+    hostname: monica-app
+
+    depends_on:
+    - db
+
+    ports:
+    - "8080:80"
+
+    volumes:
+    - /opt/homelab/data/monica/data:/var/www/html/storage:Z
+    environment:
+      APP_KEY: '${MONICA_APP_KEY}'
+      APP_ENV: 'production'
+      APP_DEBUG: 'false'
+      APP_URL: '${MONICA_APP_URL}'
+
+      # Database configuration
+      DB_HOST: 'db'
+      DB_PORT: '3306'
+      DB_DATABASE: 'monica'
+      DB_USERNAME: 'monica'
+      DB_PASSWORD: '${MONICA_DB_PASSWORD}'
+      # Mail configuration (optional - configure if you want email features)
+      MAIL_MAILER: 'log'  # Options: smtp, sendmail, mailgun, etc.
+      # MAIL_HOST: 'smtp.mailtrap.io'
+      # MAIL_PORT: '2525'
+      # MAIL_USERNAME: 'null'
+      # MAIL_PASSWORD: 'null'
+      # MAIL_ENCRYPTION: 'null'
+      # MAIL_FROM_ADDRESS: 'monica@example.com'
+      # MAIL_FROM_NAME: 'Monica'
+      # Cache and session
+      CACHE_DRIVER: 'database'
+      SESSION_DRIVER: 'database'
+      QUEUE_CONNECTION: 'sync'
+    networks:
+    - monica_network
+
+    restart: unless-stopped
+
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+networks:
+  monica_network:
+    driver: bridge

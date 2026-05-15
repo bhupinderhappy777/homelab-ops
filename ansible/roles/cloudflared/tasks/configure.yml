@@ -1,0 +1,41 @@
+---
+- name: Cloudflared | Configure | Verify token is set
+  ansible.builtin.assert:
+    that:
+      - (cloudflared_tunnel_token | default(vault_cloudflare_tunnel_token | default(''))) | length > 0
+    fail_msg: "Set cloudflared_tunnel_token or vault_cloudflare_tunnel_token"
+    success_msg: "Tunnel token is configured"
+
+- name: Cloudflared | Configure | Set effective tunnel token
+  ansible.builtin.set_fact:
+    cloudflared_tunnel_token_effective: "{{ cloudflared_tunnel_token | default(vault_cloudflare_tunnel_token) }}"
+
+- name: Cloudflared | Configure | Install tunnel service
+  ansible.builtin.command:
+    cmd: "cloudflared service install {{ cloudflared_tunnel_token_effective }}"
+  register: cloudflared_install_result
+  changed_when: "'installed' in cloudflared_install_result.stdout"
+  no_log: true
+
+- name: Cloudflared | Configure | Ensure service is enabled and running
+  ansible.builtin.systemd:
+    name: cloudflared
+    state: started
+    enabled: true
+    masked: false
+  register: cloudflared_service
+  failed_when:
+    - cloudflared_service.failed
+    - "'not found' not in cloudflared_service.msg"
+    - "'molecule' not in group_names"
+
+- name: Cloudflared | Configure | Verify tunnel is running
+  ansible.builtin.command: cloudflared tunnel info
+  register: cloudflared_tunnel_info
+  changed_when: false
+  failed_when: false
+
+- name: Cloudflared | Configure | Display tunnel info
+  ansible.builtin.debug:
+    msg: "{{ cloudflared_tunnel_info.stdout_lines if cloudflared_tunnel_info.stdout_lines | length > 0 else 'Tunnel running (run manually to see details)' }}"
+  when: cloudflared_tunnel_info.rc == 0

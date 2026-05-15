@@ -1,0 +1,226 @@
+version: '3.8'
+
+# =============================================================================
+# UNIFIED MONITORING STACK
+# Prometheus + Grafana + Loki + Promtail + cAdvisor + Node Exporter
+#
+# Deploy:  docker compose -f compose.yml up -d
+# Remove:  docker compose -f compose.yml down
+#
+# Memory: deploy.resources.limits are cgroup caps (sum is ~3.7G here). If the
+# host OOMs, lower limits/retention further or add RAM — limits do not stop
+# other stacks from using memory.
+# =============================================================================
+
+# --- 1. SERVICES SECTION (bind-mounted persistent data and configs) ---
+services:
+
+  # =========================================================================
+  # PROMETHEUS — metrics collection and alerting
+  # =========================================================================
+  prometheus:
+    image: docker.io/prom/prometheus:v2.49.1
+    hostname: prometheus
+    user: '65534:65534'
+
+    command:
+    - '--config.file=/etc/prometheus/prometheus.yml'
+    - '--storage.tsdb.path=/prometheus'
+    - '--storage.tsdb.retention.time=15d'
+    - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+    - '--web.console.templates=/usr/share/prometheus/consoles'
+    - '--web.enable-lifecycle'
+
+    ports:
+    - "9090:9090"
+
+    volumes:
+    - /opt/homelab/data/prometheus/data:/prometheus:z
+    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro,z
+
+    networks:
+    - monitoring_network
+    - couchdb_network
+    - docuseal_network
+    - firefly_iii
+    - immich_network
+    - jellyfin_network
+    - monica_network
+    - n8n_network
+    - paperless_ngx_network
+    - paperless_ai_network
+    - pihole_network
+    - portainer_network
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    restart: unless-stopped
+  grafana:
+    # Match community dashboard exports (e.g. Node Exporter 1860: schemaVersion 41, Grafana 11.6.x)
+    image: docker.io/grafana/grafana:11.6.1
+    hostname: grafana
+    user: '472:472'
+
+    ports:
+    - "3005:3000"
+
+    volumes:
+    - /opt/homelab/data/grafana/data:/var/lib/grafana:z
+    - ./grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro,z
+    - ./grafana/provisioning/dashboards/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro,z
+    - ./grafana/provisioning/dashboards/1860.json:/etc/grafana/dashboards-json/1860.json:ro,z
+    - ./grafana/provisioning/dashboards/14282.json:/etc/grafana/dashboards-json/14282.json:ro,z
+    - ./grafana/provisioning/dashboards/13639.json:/etc/grafana/dashboards-json/13639.json:ro,z
+
+    environment:
+      GF_SERVER_ROOT_URL: '${GRAFANA_ROOT_URL}'
+      GF_SECURITY_ADMIN_USER: 'admin'
+      GF_SECURITY_ADMIN_PASSWORD: '${GRAFANA_PASSWORD:-changeme}'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_PATHS_PROVISIONING: '/etc/grafana/provisioning'
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
+      GF_LOG_MODE: 'console'
+      GF_LOG_LEVEL: 'info'
+      GF_INSTALL_PLUGINS: ''
+
+    networks:
+    - monitoring_network
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    restart: unless-stopped
+  loki:
+    image: docker.io/grafana/loki:3.0.0
+    hostname: loki
+    user: '10001:10001'
+
+    command: -config.file=/etc/loki/loki-config.yml
+
+    volumes:
+    - /opt/homelab/data/loki/data:/loki:z
+    - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro,z
+
+    networks:
+    - monitoring_network
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3100/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    restart: unless-stopped
+  promtail:
+    image: docker.io/grafana/promtail:3.0.0
+    hostname: promtail
+
+    command: -config.file=/etc/promtail/promtail-config.yml
+
+    volumes:
+    # Promtail uses Docker service discovery plus direct access to json-file logs.
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    - /var/log:/var/log:ro
+    - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro,z
+
+    networks:
+    - monitoring_network
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    restart: unless-stopped
+  node-exporter:
+    image: docker.io/prom/node-exporter:v1.7.0
+    hostname: node-exporter
+
+    command:
+    - '--path.procfs=/host/proc'
+    - '--path.rootfs=/rootfs'
+    - '--path.sysfs=/host/sys'
+    - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
+    volumes:
+    - /proc:/host/proc:ro
+    - /sys:/host/sys:ro
+    - /:/rootfs:ro
+    networks:
+    - monitoring_network
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    restart: unless-stopped
+networks:
+  monitoring_network:
+    driver: bridge
+
+  # Compose names are <project>_<network> (see each app compose.yml).
+  couchdb_network:
+    external: true
+    name: couchdb_couchdb_network
+  docuseal_network:
+    external: true
+    name: docuseal_docuseal_network
+  firefly_iii:
+    external: true
+    name: firefly_firefly_iii
+  immich_network:
+    external: true
+    name: immich_immich_network
+  jellyfin_network:
+    external: true
+    name: jellyfin_jellyfin_network
+  monica_network:
+    external: true
+    name: monica_monica_network
+  n8n_network:
+    external: true
+    name: n8n_n8n_network
+  paperless_ngx_network:
+    external: true
+    name: paperless_ngx_paperless_network
+  paperless_ai_network:
+    external: true
+    name: paperless_ai_paperless_network
+  pihole_network:
+    external: true
+    name: pihole_pihole_network
+  portainer_network:
+    external: true
+    name: portainer_portainer_network

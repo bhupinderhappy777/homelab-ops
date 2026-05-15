@@ -1,0 +1,154 @@
+---
+# Install container runtime, OCI Object Storage CLI dependencies, and sysctls
+
+- name: Set runtime command facts
+  ansible.builtin.set_fact:
+    container_runtime_normalized: "{{ container_runtime | lower }}"
+    container_cli: "{{ 'podman' if (container_runtime | lower) == 'podman' else 'docker' }}"
+
+- name: Install dependencies
+  ansible.builtin.package:
+    name:
+      - ca-certificates
+      - curl
+      - git
+      - python3-pip
+      - restic
+      - unzip
+    state: present
+
+- name: Install Debian-family package helpers
+  ansible.builtin.apt:
+    name:
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+    keyring: /etc/apt/keyrings/docker.gpg
+  when:
+    - container_runtime_normalized == 'docker'
+    - ansible_facts['os_family'] == 'Debian'
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+    state: present
+    filename: docker
+  when:
+    - container_runtime_normalized == 'docker'
+    - ansible_facts['os_family'] == 'Debian'
+
+- name: Add Docker CE repository on RedHat family
+  ansible.builtin.yum_repository:
+    name: docker-ce-stable
+    description: Docker CE Stable - $basearch
+    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  when:
+    - container_runtime_normalized == 'docker'
+    - ansible_facts['os_family'] == 'RedHat'
+
+- name: Install Docker CE and plugins
+  ansible.builtin.package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+  when: container_runtime_normalized == 'docker'
+
+- name: Install Podman packages
+  ansible.builtin.package:
+    name:
+      - podman
+      - podman-compose
+    state: present
+  when: container_runtime_normalized == 'podman'
+
+- name: Add admin user to podman group when present
+  ansible.builtin.user:
+    name: "{{ admin_username | default('deployuser') }}"
+    groups: podman
+    append: yes
+  when: container_runtime_normalized == 'podman'
+  failed_when: false
+
+- name: Add admin user to docker group
+  ansible.builtin.user:
+    name: "{{ admin_username | default('deployuser') }}"
+    groups: docker
+    append: yes
+  when: container_runtime_normalized == 'docker'
+
+- name: Enable and start Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+  when: container_runtime_normalized == 'docker'
+
+- name: Enable and start Podman socket
+  ansible.builtin.systemd:
+    name: podman.socket
+    state: started
+    enabled: yes
+  when: container_runtime_normalized == 'podman'
+
+- name: Install docker CLI compatibility wrapper for Podman
+  ansible.builtin.file:
+    src: /usr/bin/podman
+    dest: /usr/local/bin/docker
+    state: link
+    force: yes
+  when: container_runtime_normalized == 'podman'
+
+- name: Check if AWS CLI v2 is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/aws
+  register: homelab_aws_cli_stat
+
+- name: Install AWS CLI v2 bundle (download, unpack, install, cleanup)
+  when: not homelab_aws_cli_stat.stat.exists
+  block:
+    - name: Download AWS CLI v2 for OCI Object Storage
+      ansible.builtin.get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-{{ 'aarch64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}.zip"
+        dest: /tmp/awscliv2.zip
+
+    - name: Unpack AWS CLI v2 bundle
+      ansible.builtin.unarchive:
+        src: /tmp/awscliv2.zip
+        dest: /tmp
+        remote_src: yes
+        creates: /tmp/aws/install
+
+    - name: Install AWS CLI v2 for S3-compatible backups
+      ansible.builtin.command: /tmp/aws/install --update
+      args:
+        creates: /usr/local/bin/aws
+
+    - name: Clean up AWS CLI bundle
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/awscliv2.zip
+        - /tmp/aws
+
+- name: Set vm.max_map_count for Elasticsearch (Immich)
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: "262144"
+    state: present
+    sysctl_set: yes
+    reload: yes

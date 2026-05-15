@@ -1,0 +1,50 @@
+version: '3.8'
+
+# --- 2. SERVICES SECTION ---
+services:
+
+  # ===========================================================================
+  # N8N WORKFLOW AUTOMATION
+  # ===========================================================================
+  n8n:
+    # Override N8N_IMAGE if you publish a custom image with extra modules.
+    image: ${N8N_IMAGE:-docker.io/n8nio/n8n:latest}
+    hostname: n8n
+    networks:
+    - n8n_network
+    - ai_network    # External network for Ollama integration
+    restart: unless-stopped
+
+    ports:
+    - "5678:5678"
+
+    environment:
+      PUID: '1002'
+      PGID: '1002'
+      N8N_USER_FOLDER: '/data'
+      WEBHOOK_URL: '${N8N_WEBHOOK_URL}'
+    volumes:
+    - /opt/homelab/data/n8n_data:/data:Z
+    - /opt/homelab/media:/home/node/downloads:z
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# --- 3. NETWORKS SECTION ---
+networks:
+  n8n_network:
+    driver: bridge
+
+  # External network for Ollama AI integration
+  ai_network:
+    external: true
+    name: openweb_ollama_ai_network

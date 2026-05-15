@@ -1,0 +1,2 @@
+---
+# Secrets (e.g. Tailscale auth key) are loaded from Azure Key Vault by role keyvault_secrets.

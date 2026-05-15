@@ -1,0 +1,18 @@
+---
+- name: Linux - SSH hardening (core settings)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    validate: "sshd -t -f %s"
+    backup: true
+  loop:
+    - { regexp: "^#?Port", line: "Port {{ security_hardening_ssh_port }}" }
+    - { regexp: "^#?PermitRootLogin", line: "PermitRootLogin {{ security_hardening_permit_root_login }}" }
+    - { regexp: "^#?PasswordAuthentication", line: "PasswordAuthentication {{ security_hardening_password_auth }}" }
+  notify: Restart SSH
+  when: not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:auth
+    - security:ssh

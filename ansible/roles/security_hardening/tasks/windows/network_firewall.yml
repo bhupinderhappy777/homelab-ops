@@ -1,0 +1,46 @@
+---
+- name: Windows - enable Windows Firewall
+  ansible.windows.win_firewall_profile:
+    state: "on"
+    profile: "{{ item }}"
+  loop:
+    - Domain
+    - Private
+    - Public
+  when: not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+    - security:windows
+
+- name: Windows - default deny inbound except allowed ports
+  ansible.windows.win_firewall_rule:
+    name: "SecurityHardening Default Inbound"
+    direction: in
+    action: block
+    enabled: true
+    profile: any
+  when: not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+    - security:windows
+
+- name: Windows - allow required inbound management ports
+  ansible.windows.win_firewall_rule:
+    name: "SecurityHardening Allowed Port {{ item }}"
+    direction: in
+    action: allow
+    enabled: true
+    protocol: tcp
+    localport: "{{ item }}"
+    profile: any
+  loop: "{{ security_hardening_windows_allowed_ports | default([5985, 5986]) }}"
+  when: not (security_hardening_verify_only | default(false))
+  tags:
+    - security
+    - security:network
+    - security:firewall
+    - security:windows

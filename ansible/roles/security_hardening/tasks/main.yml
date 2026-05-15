@@ -1,0 +1,30 @@
+---
+- name: Assert supported OS for security hardening
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] is defined
+      - >-
+        ansible_facts['os_family'] in ['RedHat', 'Debian', 'Windows'] or
+        ansible_system == 'Win32NT'
+    fail_msg: >-
+      Unsupported OS family {{ ansible_facts['os_family'] | default('unset') }} /
+      system {{ ansible_system | default('unset') }} for security_hardening role
+  tags:
+    - always
+    - security
+    - security:os_check
+
+- name: Include Linux security hardening
+  ansible.builtin.include_tasks: linux/main.yml
+  when: ansible_facts['os_family'] in ['RedHat', 'Debian']
+  tags:
+    - security
+    - security:linux
+
+- name: Include Windows security hardening
+  ansible.builtin.include_tasks: windows/main.yml
+  when:
+    - ansible_facts['os_family'] == 'Windows' or ansible_system == 'Win32NT'
+  tags:
+    - security
+    - security:windows

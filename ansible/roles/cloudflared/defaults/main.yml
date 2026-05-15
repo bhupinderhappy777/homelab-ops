@@ -1,0 +1,5 @@
+---
+cloudflared_version: "2026.3.0"
+cloudflared_install_dir: /usr/local/bin
+cloudflared_user: root
+cloudflared_group: root

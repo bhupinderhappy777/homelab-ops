@@ -1,0 +1,8 @@
+---
+homelab_backup_hour: "3"
+homelab_backup_minute: "0"
+homelab_backup_keep_daily: 7
+homelab_backup_keep_weekly: 4
+homelab_backup_keep_monthly: 6
+homelab_backup_repo_prefix: "restic/homelab"
+homelab_backup_max_repo_size_gb: 20

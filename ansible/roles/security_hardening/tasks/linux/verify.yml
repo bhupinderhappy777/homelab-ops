@@ -1,0 +1,30 @@
+---
+- name: Linux - verify SSH syntax valid
+  ansible.builtin.command: sshd -t
+  changed_when: false
+  failed_when: false
+  register: security_hardening_ssh_test
+  tags:
+    - security
+    - security:verify
+    - security:ssh
+
+- name: Linux - gather service facts
+  ansible.builtin.service_facts:
+  tags:
+    - security
+    - security:verify
+
+- name: Linux - assert SSH service running and config valid
+  ansible.builtin.assert:
+    that:
+      - security_hardening_ssh_test.rc == 0
+      - ansible_facts.services[ssh_service_name + '.service'].state == 'running'
+    fail_msg: "SSH service or config failed verification on {{ inventory_hostname }}"
+    success_msg: "SSH is secure and running on {{ inventory_hostname }}"
+  vars:
+    ssh_service_name: "{{ 'ssh' if ansible_facts['os_family'] == 'Debian' else 'sshd' }}"
+  tags:
+    - security
+    - security:verify
+    - security:ssh

@@ -1,0 +1,50 @@
+---
+- name: Install Tailscale | Debian/Ubuntu
+  when: ansible_facts['os_family'] == 'Debian'
+  become: true
+  block:
+    - name: Install Tailscale | Add GPG key
+      ansible.builtin.get_url:
+        url: "https://pkgs.tailscale.com/stable/{{ ansible_facts['distribution'] | lower }}/{{ ansible_facts['distribution_release'] }}.noarmor.gpg"
+        dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+        mode: "0644"
+
+    - name: Install Tailscale | Add repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg]
+          https://pkgs.tailscale.com/stable/{{ ansible_facts['distribution'] | lower }}
+          {{ ansible_facts['distribution_release'] }} main
+        state: present
+        filename: tailscale
+
+- name: Install Tailscale | RedHat/Fedora
+  when: ansible_facts['os_family'] == 'RedHat'
+  become: true
+  block:
+    - name: Install Tailscale | Add repository
+      ansible.builtin.yum_repository:
+        name: tailscale-stable
+        description: Tailscale stable
+        baseurl: "https://pkgs.tailscale.com/stable/{{ ansible_facts['distribution'] | lower }}/$basearch"
+        gpgcheck: true
+        gpgkey: "https://pkgs.tailscale.com/stable/{{ ansible_facts['distribution'] | lower }}/repo.gpg"
+        state: present
+
+- name: Install Tailscale | Package
+  ansible.builtin.package:
+    name: tailscale
+    state: present
+  become: true
+
+- name: Ensure Tailscale service is started and enabled
+  ansible.builtin.systemd:
+    name: tailscaled
+    state: started
+    enabled: true
+  become: true
+  register: tailscale_tailscaled_service
+  failed_when:
+    - tailscale_tailscaled_service.failed
+    - "'not found' not in tailscale_tailscaled_service.msg"
+    - "'molecule' not in group_names"
