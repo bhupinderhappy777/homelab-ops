@@ -1,3 +1,6 @@
+# ARCHIVED — not loaded by Terraform. Optional lab Key Vault in the compute RG was removed
+# so secrets stay in vault-rg (or your chosen vault). SSH admin key locals live in terraform/main.tf.
+#
 data "azurerm_client_config" "current" {}
 
 resource "random_id" "keyvault_suffix" {
@@ -24,10 +27,4 @@ resource "azurerm_key_vault" "homelab" {
   tags = {
     environment = var.environment
   }
-}
-
-locals {
-  admin_ssh_public_key = trimspace(
-    var.ssh_public_key != "" ? var.ssh_public_key : file(pathexpand(var.ssh_public_key_path))
-  )
 }
