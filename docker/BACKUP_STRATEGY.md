@@ -41,6 +41,7 @@ Each snapshot payload should contain:
 - `db-dumps/immich_db.sql`
 - `db-dumps/monica_db.sql`
 - `db-dumps/paperless_ngx_db.sql`
+ - `db-dumps/authentik_db.sql`
 - `manifest.txt`
 - a restic snapshot of `/opt/homelab/data`
 

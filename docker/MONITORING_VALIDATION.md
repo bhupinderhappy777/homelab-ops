@@ -63,6 +63,14 @@ Expect messages indicating Docker target discovery against `CONTAINER_SOCKET_PAT
 
 ```bash
 curl -sS http://localhost:9100/metrics | head -20
+
+### Authentik
+
+Verify Prometheus scrapes Authentik metrics:
+
+```bash
+curl -sS http://localhost:9090/api/v1/targets | jq '.data.activeTargets[] | select(.labels.job=="authentik")'
+```
 ```
 
 ## Common issues
