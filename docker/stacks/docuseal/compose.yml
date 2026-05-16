@@ -7,6 +7,7 @@ services:
     image: docker.io/library/postgres:15
     hostname: postgres
     networks:
+    - homelab_network
     - docuseal_network
     restart: unless-stopped
 
@@ -33,6 +34,7 @@ services:
     image: docker.io/docuseal/docuseal:latest
     hostname: app
     networks:
+    - homelab_network
     - docuseal_network
     restart: unless-stopped
 
@@ -56,5 +58,8 @@ services:
         max-size: "10m"
         max-file: "3"
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   docuseal_network:
     driver: bridge

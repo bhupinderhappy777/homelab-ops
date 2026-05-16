@@ -10,6 +10,7 @@ services:
     image: docker.io/library/postgres:16.2
     hostname: paperless-db
     networks:
+    - homelab_network
     - paperless_network
     restart: unless-stopped
 
@@ -39,6 +40,7 @@ services:
     image: docker.io/library/redis:latest
     hostname: paperless-redis
     networks:
+    - homelab_network
     - paperless_network
     restart: unless-stopped
 
@@ -66,6 +68,7 @@ services:
     image: ghcr.io/paperless-ngx/paperless-ngx:2.20.13
     hostname: paperless-webserver
     networks:
+    - homelab_network
     - paperless_network
     restart: unless-stopped
 
@@ -141,5 +144,8 @@ services:
 
 # --- 3. NETWORKS SECTION ---
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   paperless_network:
     driver: bridge

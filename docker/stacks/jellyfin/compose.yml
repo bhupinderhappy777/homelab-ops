@@ -21,6 +21,7 @@ services:
 
     # Standard bridge networking.
     networks:
+    - homelab_network
     - jellyfin_network
 
     ports:
@@ -49,5 +50,8 @@ services:
         max-file: "3"
 
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   jellyfin_network:
     driver: bridge

@@ -40,9 +40,13 @@ services:
     - label=disable
 
     networks:
+    - homelab_network
     - portainer_network
 
 # --- 3. NETWORKS SECTION ---
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   portainer_network:
     driver: bridge

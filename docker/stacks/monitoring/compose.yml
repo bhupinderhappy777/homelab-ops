@@ -39,19 +39,8 @@ services:
     - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
     networks:
+    - homelab_network
     - monitoring_network
-    - couchdb_network
-    - docuseal_network
-    - firefly_iii
-    - immich_network
-    - jellyfin_network
-    - monica_network
-    - n8n_network
-    - paperless_ngx_network
-    - paperless_ai_network
-    - pihole_network
-    - portainer_network
-    - authentik_network
 
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
@@ -95,6 +84,7 @@ services:
       GF_INSTALL_PLUGINS: ''
 
     networks:
+    - homelab_network
     - monitoring_network
 
     healthcheck:
@@ -123,6 +113,7 @@ services:
     - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro
 
     networks:
+    - homelab_network
     - monitoring_network
 
     healthcheck:
@@ -153,6 +144,7 @@ services:
     - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
 
     networks:
+    - homelab_network
     - monitoring_network
 
     logging:
@@ -189,38 +181,6 @@ services:
 networks:
   monitoring_network:
     driver: bridge
-
-  # Compose names are <project>_<network> (see each app compose.yml).
-  couchdb_network:
+  homelab_network:
     external: true
-    name: couchdb_couchdb_network
-  docuseal_network:
-    external: true
-    name: docuseal_docuseal_network
-  firefly_iii:
-    external: true
-    name: firefly_firefly_iii
-  immich_network:
-    external: true
-    name: immich_immich_network
-  jellyfin_network:
-    external: true
-    name: jellyfin_jellyfin_network
-  monica_network:
-    external: true
-    name: monica_monica_network
-  n8n_network:
-    external: true
-    name: n8n_n8n_network
-  paperless_ngx_network:
-    external: true
-    name: paperless_ngx_paperless_network
-  paperless_ai_network:
-    external: true
-    name: paperless_ai_paperless_network
-  pihole_network:
-    external: true
-    name: pihole_pihole_network
-  portainer_network:
-    external: true
-    name: portainer_portainer_network
+    name: homelab-network

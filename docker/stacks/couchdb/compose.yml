@@ -6,6 +6,7 @@ services:
     image: docker.io/library/couchdb:latest
     hostname: couchdb
     networks:
+    - homelab_network
     - couchdb_network
     restart: unless-stopped
 
@@ -31,5 +32,8 @@ services:
         max-size: "10m"
         max-file: "3"
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   couchdb_network:
     driver: bridge

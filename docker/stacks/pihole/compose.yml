@@ -28,6 +28,10 @@ services:
     - SYS_NICE
     - SYS_TIME
 
+    networks:
+    - homelab_network
+    - pihole_network
+
     restart: unless-stopped
 
     healthcheck:
@@ -42,10 +46,10 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    networks:
-    - pihole_network
-
 # --- 3. NETWORKS SECTION ---
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   pihole_network:
     driver: bridge

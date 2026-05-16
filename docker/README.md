@@ -19,6 +19,10 @@ The same playbook wires **nightly OCI restic backups** (`docker_backup_cron`) an
 
 Cloudflare Tunnel is not a Compose stack here: Ansible installs the `cloudflared` systemd service from a Key Vault–backed token.
 
+All stacks now join a shared Docker bridge named `homelab-network`. If a stack
+uses authentik proxy auth, configure the authentik Docker integration to use
+`homelab-network` so the outpost lands on the same bridge.
+
 ## Monitoring
 
 Grafana dashboards are **file-provisioned** from `stacks/monitoring/grafana/provisioning/dashboards/` (refresh IDs with `stacks/monitoring/download-dashboards.sh`, then commit). After deploy, smoke-test with [MONITORING_VALIDATION.md](MONITORING_VALIDATION.md).

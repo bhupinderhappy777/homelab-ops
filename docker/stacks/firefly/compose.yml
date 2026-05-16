@@ -7,6 +7,7 @@ services:
     image: docker.io/fireflyiii/core:latest
     hostname: app
     networks:
+    - homelab_network
     - firefly_iii
     volumes:
     - /opt/homelab/data/firefly_iii/firefly_iii_upload:/var/www/html/storage/upload
@@ -25,6 +26,9 @@ services:
 
       SITE_OWNER: 'you@example.com'
       STATIC_CRON_TOKEN: '${FIREFLY_CRON_TOKEN}' # ❗ REPLACE with your actual token
+      AUTHENTICATION_GUARD: 'remote_user_guard'
+      AUTHENTICATION_GUARD_HEADER: 'HTTP_X_AUTHENTIK_EMAIL'
+      AUTHENTICATION_GUARD_EMAIL: 'HTTP_X_AUTHENTIK_EMAIL'
       APP_URL: '${FIREFLY_APP_URL}'
       FIREFLY_III_URL: 'http://app:8080'
       CACHE_DRIVER: 'file'
@@ -52,6 +56,7 @@ services:
     image: docker.io/library/mariadb:lts
     hostname: db
     networks:
+    - homelab_network
     - firefly_iii
     volumes:
     - /opt/homelab/data/firefly_iii/firefly_iii_db:/var/lib/mysql
@@ -79,6 +84,7 @@ services:
     image: docker.io/fireflyiii/data-importer:version-1.5.5
     hostname: importer
     networks:
+    - homelab_network
     - firefly_iii
 
     ports:
@@ -115,6 +121,7 @@ services:
       crond -f -L /dev/stdout"
 
     networks:
+    - homelab_network
     - firefly_iii
 
     logging:
@@ -124,5 +131,8 @@ services:
         max-file: "3"
     restart: unless-stopped
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   firefly_iii:
     driver: bridge

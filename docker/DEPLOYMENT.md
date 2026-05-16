@@ -77,6 +77,11 @@ This repo only:
 That matches the intended production model: you create and manage the tunnel in
 Cloudflare Zero Trust, and this repo only connects the host to it.
 
+All Docker stacks in this repo now share a bridge network named
+`homelab-network`. When you configure an authentik Docker outpost, set the
+integration's `docker_network` to `homelab-network` so the outpost can reach
+services directly on that bridge.
+
 The dashboard should route public hostnames to host-published local ports.
 
 Examples:
@@ -88,6 +93,11 @@ Examples:
 - `grafana.<domain>` -> `http://localhost:3005`
 - `portainer.<domain>` -> `http://localhost:9000`
  - `authentik.<domain>` -> `http://localhost:9009` (HTTPS edge -> `localhost:9446` if you prefer TLS at edge)
+
+For proxy-protected apps, let Cloudflare handle the tunnel and authentik
+handle the login flow. Firefly is expected to resolve through
+`homelab-network`, not through the host-published port, once the outpost is on
+the same bridge.
 
 Make sure only the intended production host is running the production tunnel token at any given time.
 

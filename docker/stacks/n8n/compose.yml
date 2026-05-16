@@ -11,8 +11,8 @@ services:
     image: ${N8N_IMAGE:-docker.io/n8nio/n8n:latest}
     hostname: n8n
     networks:
+    - homelab_network
     - n8n_network
-    - ai_network    # External network for Ollama integration
     restart: unless-stopped
 
     ports:
@@ -41,10 +41,8 @@ services:
 
 # --- 3. NETWORKS SECTION ---
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   n8n_network:
     driver: bridge
-
-  # External network for Ollama AI integration
-  ai_network:
-    external: true
-    name: openweb_ollama_ai_network

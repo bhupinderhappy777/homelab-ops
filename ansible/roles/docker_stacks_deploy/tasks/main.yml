@@ -94,7 +94,7 @@
     executable: /bin/bash
   loop:
     - cftunnel
-    - openweb_ollama_ai_network
+    - homelab-network
   register: homelab_networks
   changed_when: item in homelab_networks.stdout
 

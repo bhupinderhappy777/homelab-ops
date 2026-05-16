@@ -26,6 +26,8 @@ Guidelines:
 - Keep ports explicit.
 - Add a healthcheck if the image supports one reliably.
 - Use the shared `.env` variables only when the service truly needs them.
+- Attach the service to the shared `homelab-network` in addition to any
+	stack-local network it still needs.
 
 ## 2. Directory creation in Ansible
 
@@ -58,6 +60,8 @@ Include the expected compose network name and compose network label.
 
 Deploy order matters when a stack depends on external networks created by other
 stacks.
+
+Prefer the shared `homelab-network` over ad hoc cross-stack bridge networks.
 
 ## 4. Backup and restore decision
 

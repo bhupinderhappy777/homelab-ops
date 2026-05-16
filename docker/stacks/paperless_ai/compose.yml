@@ -40,9 +40,13 @@ services:
     volumes:
     - /opt/homelab/data/paperless-ai_data:/app/data
     networks:
+    - homelab_network
     - paperless_network
 
 
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   paperless_network:
     driver: bridge

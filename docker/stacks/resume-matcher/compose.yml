@@ -10,6 +10,7 @@ services:
     image: ghcr.io/srbhr/resume-matcher:latest
     hostname: resume-matcher
     networks:
+    - homelab_network
     - resume_matcher_network
     restart: unless-stopped
 
@@ -43,5 +44,8 @@ services:
         max-file: '3'
 
 networks:
+  homelab_network:
+    external: true
+    name: homelab-network
   resume_matcher_network:
     driver: bridge

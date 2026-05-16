@@ -16,6 +16,8 @@ services:
     restart: unless-stopped
     volumes:
     - /opt/homelab/data/authentik/database:/var/lib/postgresql/data
+    networks:
+    - homelab_network
   server:
     command: server
     depends_on:
@@ -42,6 +44,8 @@ services:
     volumes:
     - /opt/homelab/data/authentik/data:/data
     - /opt/homelab/data/authentik/custom-templates:/templates
+    networks:
+    - homelab_network
   worker:
     command: worker
     depends_on:
@@ -62,6 +66,13 @@ services:
     - /opt/homelab/data/authentik/data:/data
     - /opt/homelab/data/authentik/certs:/certs
     - /opt/homelab/data/authentik/custom-templates:/templates
+    networks:
+    - homelab_network
 volumes:
   database:
     driver: local
+
+networks:
+  homelab_network:
+    external: true
+    name: homelab-network
