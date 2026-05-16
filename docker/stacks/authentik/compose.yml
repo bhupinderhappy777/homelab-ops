@@ -15,7 +15,7 @@ services:
     image: docker.io/library/postgres:16-alpine
     restart: unless-stopped
     volumes:
-    - /opt/homelab/authentik/database:/var/lib/postgresql/data
+    - /opt/homelab/data/authentik/database:/var/lib/postgresql/data
   server:
     command: server
     depends_on:
@@ -34,8 +34,8 @@ services:
     restart: unless-stopped
     shm_size: 512mb
     volumes:
-    - /opt/homelab/authentik/data:/data
-    - /opt/homelab/authentik/custom-templates:/templates
+    - /opt/homelab/data/authentik/data:/data
+    - /opt/homelab/data/authentik/custom-templates:/templates
   worker:
     command: worker
     depends_on:
@@ -53,9 +53,9 @@ services:
     user: root
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-    - /opt/homelab/authentik/data:/data
-    - /opt/homelab/authentik/certs:/certs
-    - /opt/homelab/authentik/custom-templates:/templates
+    - /opt/homelab/data/authentik/data:/data
+    - /opt/homelab/data/authentik/certs:/certs
+    - /opt/homelab/data/authentik/custom-templates:/templates
 volumes:
   database:
     driver: local
