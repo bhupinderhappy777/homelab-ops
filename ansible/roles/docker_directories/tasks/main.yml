@@ -85,3 +85,7 @@
     - { path: "/opt/homelab/data/prometheus/data", owner: "65534", group: "65534" }
     - { path: "/opt/homelab/data/grafana/data", owner: "472", group: "472" }
     - { path: "/opt/homelab/data/loki/data", owner: "10001", group: "10001" }
+    - { path: "/opt/homelab/data/authentik/data", owner: "1000", group: "1000" }
+    - { path: "/opt/homelab/data/authentik/certs", owner: "1000", group: "1000" }
+    - { path: "/opt/homelab/data/authentik/custom-templates", owner: "1000", group: "1000" }
+    - { path: "/opt/homelab/data/authentik/database", owner: "1000", group: "1000" }

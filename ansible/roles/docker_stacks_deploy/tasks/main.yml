@@ -78,6 +78,8 @@
     owner: "{{ admin_username | default('deployuser') }}"
     group: "{{ admin_username | default('deployuser') }}"
     mode: '0600'
+  tags:
+    - secrets
 
 - name: Ensure shared and external compose networks exist
   ansible.builtin.shell: |
