@@ -3,6 +3,9 @@
   ansible.builtin.set_fact:
     homelab_compose_cmd: "docker compose"
     homelab_light_stacks:
+      - name: authentik
+        compose_network_name: authentik_authentik_network
+        compose_network_label: authentik_network
       - name: torrent-client
         compose_network_name: torrent-client_torrent_client_network
         compose_network_label: torrent_client_network
@@ -64,7 +67,7 @@
 - name: Clone homelab-ops repo to host
   ansible.builtin.git:
     repo: "{{ docker_stacks_repo_url }}"
-    dest: /opt/homelab/docker_stacks
+    dest: /opt/homelab/homelab_ops
     version: "{{ docker_stacks_branch | default('main') }}"
     update: yes
     accept_hostkey: yes
@@ -74,7 +77,7 @@
 - name: Template general .env file
   ansible.builtin.template:
     src: homelab.env.j2
-    dest: /opt/homelab/docker_stacks/docker/.env
+    dest: /opt/homelab/homelab_ops/docker/.env
     owner: "{{ admin_username | default('deployuser') }}"
     group: "{{ admin_username | default('deployuser') }}"
     mode: '0600'
