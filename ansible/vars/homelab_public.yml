@@ -1,6 +1,6 @@
 ---
 # Non-secret defaults (safe to commit). Override via inventory group_vars or -e extra_vars.
-admin_username: deployuser
+admin_username: bhupi
 docker_stacks_branch: main
 # Git URL for /opt/homelab/docker_stacks. SSH + agent forwarding: ansible.cfg has ForwardAgent=yes;
 # run `ssh-add` on your laptop so the key that can read this repo is loaded before ansible-playbook.

@@ -12,11 +12,11 @@ if [ -z "$STACK_NAME" ]; then
     exit 1
 fi
 
-if [ ! -f "stacks/$STACK_NAME/compose.yml" ]; then
+if [ ! -f "../stacks/$STACK_NAME/compose.yml" ]; then
     echo "Error: Stack '$STACK_NAME' not found!"
     exit 1
 fi
 
 echo "Deploying $STACK_NAME..."
-"${COMPOSE_CMD[@]}" --env-file .env -f "stacks/$STACK_NAME/compose.yml" up -d --remove-orphans
+"${COMPOSE_CMD[@]}" --env-file ../.env -f "../stacks/$STACK_NAME/compose.yml" up -d --remove-orphans
 echo "Done!"
