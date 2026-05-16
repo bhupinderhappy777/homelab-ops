@@ -197,6 +197,9 @@ chown -R 65534:65534 "${TARGET_DATA_ROOT}/prometheus/data" 2>/dev/null || true
 chown -R 472:472 "${TARGET_DATA_ROOT}/grafana/data" 2>/dev/null || true
 chown -R 10001:10001 "${TARGET_DATA_ROOT}/loki/data" 2>/dev/null || true
 
+# Authentik data ownership
+chown -R 1000:1000 "${TARGET_DATA_ROOT}/authentik/data" "${TARGET_DATA_ROOT}/authentik/certs" "${TARGET_DATA_ROOT}/authentik/custom-templates" "${TARGET_DATA_ROOT}/authentik/database" 2>/dev/null || true
+
 if [[ -f "${RESTORED_DUMP_ROOT}/firefly_db.sql" ]]; then
   exec_in_i "firefly-db" sh -lc 'mariadb -ufirefly -p"$MYSQL_PASSWORD" firefly' < "${RESTORED_DUMP_ROOT}/firefly_db.sql"
 fi
@@ -214,6 +217,11 @@ fi
 if [[ -f "${RESTORED_DUMP_ROOT}/docuseal_db.sql" ]]; then
   exec_in "docuseal-postgres" psql -U postgres -d docuseal -v ON_ERROR_STOP=1 -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;'
   exec_in_i "docuseal-postgres" psql -U postgres -d docuseal -v ON_ERROR_STOP=1 < "${RESTORED_DUMP_ROOT}/docuseal_db.sql"
+fi
+
+if [[ -f "${RESTORED_DUMP_ROOT}/authentik_db.sql" ]]; then
+  exec_in "authentik_postgresql" psql -U authentik -d authentik -v ON_ERROR_STOP=1 -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO authentik; GRANT ALL ON SCHEMA public TO public;'
+  exec_in_i "authentik_postgresql" psql -U authentik -d authentik -v ON_ERROR_STOP=1 < "${RESTORED_DUMP_ROOT}/authentik_db.sql"
 fi
 
 echo "Restore complete"

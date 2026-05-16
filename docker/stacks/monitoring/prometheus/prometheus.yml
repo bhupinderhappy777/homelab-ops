@@ -24,4 +24,9 @@ scrape_configs:
       - targets: ['loki:3100']
     metrics_path: '/metrics'
 
+  - job_name: 'authentik'
+    static_configs:
+      - targets: ['server:9000']
+    metrics_path: '/metrics'
+
   # --- application targets (carried over from prometheus/prometheus.yml) ---

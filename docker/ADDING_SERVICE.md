@@ -83,8 +83,10 @@ excluded.
 
 Update the backup and restore scripts:
 
-- `docker/scripts/backup.sh`
-- `docker/scripts/restore.sh`
+
+For Authentik specifically:
+- Add a PostgreSQL dump `authentik_db.sql` to the `db-dumps/` payload.
+- Exclude `/opt/homelab/data/authentik/database` from restic snapshots and restore the dump into the `authentik_postgresql` container during restore.
 
 Add:
 

@@ -16,4 +16,5 @@ backup_restore_stacks:
   - immich
   - jellyfin
   - monitoring
+  - authentik
   - uptime-kuma

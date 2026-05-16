@@ -1,0 +1,67 @@
+services:
+  authentik_postgresql:
+    environment:
+      POSTGRES_DB: ${PG_DB:-authentik}
+      POSTGRES_PASSWORD: ${AUTHENTIK_PG_PASS:?database password required}
+      POSTGRES_USER: ${PG_USER:-authentik}
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+      - CMD-SHELL
+      - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 5s
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+    - /opt/homelab/data/authentik/database:/var/lib/postgresql/data
+  server:
+    command: server
+    depends_on:
+      authentik_postgresql:
+        condition: service_healthy
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS:?database password required}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2026.2.3}
+    ports:
+    - ${COMPOSE_PORT_HTTP:-9000}:9000
+    - ${COMPOSE_PORT_HTTPS:-9443}:9443
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:9000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    shm_size: 512mb
+    volumes:
+    - /opt/homelab/data/authentik/data:/data
+    - /opt/homelab/data/authentik/custom-templates:/templates
+  worker:
+    command: worker
+    depends_on:
+      authentik_postgresql:
+        condition: service_healthy
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS:?database password required}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2026.2.3}
+    restart: unless-stopped
+    shm_size: 512mb
+    user: root
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /opt/homelab/data/authentik/data:/data
+    - /opt/homelab/data/authentik/certs:/certs
+    - /opt/homelab/data/authentik/custom-templates:/templates
+volumes:
+  database:
+    driver: local

@@ -26,3 +26,7 @@ homelab_keyvault_secret_map:
   - { var: vault_oci_s3_bucket, kv: oci-s3-bucket }
   - { var: vault_oci_s3_endpoint, kv: oci-s3-endpoint }
   - { var: vault_tailscale_auth_key, kv: tailscale-auth-key }
+  - { var: vault_authentik_email_username, kv: authentik-email-username }
+  - { var: vault_authentik_email_password, kv: authentik-email-password }
+  - { var: vault_authentik_pg_pass, kv: authentik-pg-pass }
+  - { var: vault_authentik_secret_key, kv: authentik-secret-key }

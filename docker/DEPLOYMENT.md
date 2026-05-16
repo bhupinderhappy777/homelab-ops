@@ -87,6 +87,7 @@ Examples:
 - `immich.<domain>` -> `http://localhost:2283`
 - `grafana.<domain>` -> `http://localhost:3005`
 - `portainer.<domain>` -> `http://localhost:9000`
+ - `authentik.<domain>` -> `http://localhost:9009` (HTTPS edge -> `localhost:9446` if you prefer TLS at edge)
 
 Make sure only the intended production host is running the production tunnel token at any given time.
 

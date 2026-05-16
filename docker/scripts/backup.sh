@@ -102,6 +102,9 @@ exec_in "immich-database" pg_dump -U postgres immich > "${DB_DUMP_DIR}/immich_db
 exec_in "firefly-db" sh -lc 'mariadb-dump -ufirefly -p"$MYSQL_PASSWORD" firefly' > "${DB_DUMP_DIR}/firefly_db.sql"
 exec_in "monica-db" sh -lc 'mariadb-dump -umonica -p"$MYSQL_PASSWORD" monica' > "${DB_DUMP_DIR}/monica_db.sql"
 
+# Authentik PostgreSQL dump
+exec_in "authentik_postgresql" pg_dump -U authentik authentik > "${DB_DUMP_DIR}/authentik_db.sql" || true
+
 cat > "${BACKUP_ROOT}/manifest.txt" <<EOF
 timestamp=${TIMESTAMP}
 host=${HOSTNAME_TAG}
@@ -131,6 +134,7 @@ restic backup \
   --exclude "${DATA_ROOT}/prometheus" \
   --exclude "${DATA_ROOT}/grafana" \
   --exclude "${DATA_ROOT}/loki" \
+  --exclude "${DATA_ROOT}/authentik/database" \
   --exclude "${DATA_ROOT}/portainer_data" \
   --exclude "${DATA_ROOT}/jellyfin/cache" \
   --exclude "${DATA_ROOT}/openwebui_data/cache" \
