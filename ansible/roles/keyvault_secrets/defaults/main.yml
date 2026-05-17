@@ -17,7 +17,6 @@ homelab_keyvault_secret_map:
   - { var: vault_monica_app_key, kv: monica-app-key }
   - { var: vault_grafana_password, kv: grafana-password }
   - { var: vault_openwebui_secret_key, kv: openwebui-secret-key }
-  - { var: vault_paperless_db_user, kv: paperless-db-user }
   - { var: vault_paperless_db_password, kv: paperless-db-password }
   - { var: vault_pihole_password, kv: pihole-password }
   - { var: vault_restic_password, kv: restic-password }
@@ -30,3 +29,4 @@ homelab_keyvault_secret_map:
   - { var: vault_authentik_email_password, kv: authentik-email-password }
   - { var: vault_authentik_pg_pass, kv: authentik-pg-pass }
   - { var: vault_authentik_secret_key, kv: authentik-secret-key }
+  - { var: vault_paperless_socialaccount_providers, kv: paperless-socialaccount-providers }

@@ -17,7 +17,7 @@ services:
     volumes:
     - /opt/homelab/data/paperless_ngx/paperless_postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: '${PAPERLESS_DB_USER}'         # ❗ CHANGE THIS
+      POSTGRES_USER: 'paperless_user'
       POSTGRES_PASSWORD: '${PAPERLESS_DB_PASSWORD}' # ❗ CHANGE THIS
       POSTGRES_DB: 'paperless_db'
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
@@ -89,7 +89,7 @@ services:
       PAPERLESS_DBHOST: 'db'
       PAPERLESS_DBPORT: '5432'
       PAPERLESS_DBNAME: 'paperless_db'
-      PAPERLESS_DBUSER: '${PAPERLESS_DB_USER}'      # ❗ CHANGE THIS (must match db service)
+      PAPERLESS_DBUSER: 'paperless_user'
       PAPERLESS_DBPASS: '${PAPERLESS_DB_PASSWORD}'  # ❗ CHANGE THIS (must match db service)
       PAPERLESS_DBENGINE: 'django.db.backends.postgresql'
       PAPERLESS_AUDIT_LOG_ENABLED: 'true'
@@ -124,6 +124,12 @@ services:
       PAPERLESS_CONSUMER_POLLING: '10'
       PAPERLESS_CONSUMER_RECURSIVE: 'true'
       PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: 'true'
+
+      PAPERLESS_APPS: ${PAPERLESS_APPS}  # From .env, e.g. "allauth.socialaccount.providers.openid_connect"
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: ${PAPERLESS_SOCIALACCOUNT_PROVIDERS}  # From .env
+      PAPERLESS_LOGOUT_REDIRECT_URL: ${PAPERLESS_LOGOUT_REDIRECT_URL}  # From .env, e.g. "https://authentik.bhupindergill.ca/application/o/paperless/end-session/"
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: ${PAPERLESS_SOCIAL_AUTO_SIGNUP}  # From .env, e.g. "true"
+      PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: ${PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS}  # From .env, e.g. "true"
 
       # User mapping
       USERMAP_UID: '1002'

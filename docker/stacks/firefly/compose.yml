@@ -33,8 +33,6 @@ services:
       FIREFLY_III_URL: 'http://app:8080'
       CACHE_DRIVER: 'file'
       SESSION_DRIVER: 'file'
-    ports:
-    - "82:8080"
 
     # FIXED: Switched to wget for better Alpine compatibility
     healthcheck:

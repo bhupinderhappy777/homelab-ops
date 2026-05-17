@@ -14,4 +14,4 @@ Notes:
 
 - Firefly uses the email address as the user identifier in this setup.
 - If you enable authentik-backed login, disable Firefly's own MFA flow so authentik remains the source of authentication.
-- The Firefly app container is still published on port `82`, but the preferred internal host is the Firefly container name on `homelab-network` once the outpost is attached to that shared bridge, for example `http://firefly-app-1:8080`.
+- The Firefly app container is internal-only now; authentik outpost should reach it over `homelab-network` using the container name, for example `http://app:8080`.
