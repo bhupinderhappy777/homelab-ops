@@ -5,23 +5,84 @@ services:
     build:
       context: .
     image: local-transmission:latest
+    container_name: torrent-client
     hostname: torrent-client
     user: '1002:1002'
     networks:
-    - homelab_network
-    - torrent_client_network
+      - homelab_network
+      - torrent_client_network
     ports:
-    - "6882:6882"
-    - "9091:9091"
+      - "6882:6882"
+      - "9091:9091"
     volumes:
-    - /home/${ADMIN_USER}/media:/downloads
+      - /home/adminuser/media:/downloads
     restart: unless-stopped
-
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - TZ=America/Vancouver
+    ports:
+      - "8191:8191"
+    networks:
+      - homelab_network
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1002
+      - PGID=1002
+      - TZ=America/Vancouver
+    volumes:
+      - ./config/prowlarr:/config
+    ports:
+      - "9696:9696"
+    networks:
+      - homelab_network
+    restart: unless-stopped
+    depends_on:
+      - flaresolverr
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1002
+      - PGID=1002
+      - TZ=America/Vancouver
+    volumes:
+      - ./config/radarr:/config
+      - /home/adminuser/media:/downloads
+    ports:
+      - "7878:7878"
+    networks:
+      - homelab_network
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1002
+      - PGID=1002
+      - TZ=America/Vancouver
+    volumes:
+      - ./config/sonarr:/config
+      - /home/adminuser/media:/downloads
+    ports:
+      - "8989:8989"
+    networks:
+      - homelab_network
+    restart: unless-stopped
 
 networks:
   homelab_network:
