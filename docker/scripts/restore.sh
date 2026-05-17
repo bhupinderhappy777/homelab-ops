@@ -189,6 +189,7 @@ repair_n8n_sqlite_if_needed
 
 chown -R 1000:1000 "${TARGET_DATA_ROOT}/paperless-ai_data" "${TARGET_DATA_ROOT}/n8n_data" "${TARGET_DATA_ROOT}/uptime-kuma/data" 2>/dev/null || true
 chown -R 1002:1002 "${TARGET_DATA_ROOT}/jellyfin_data/config" 2>/dev/null || true
+chown -R 1002:1002 "${TARGET_DATA_ROOT}/transmission" "${TARGET_DATA_ROOT}/prowlarr" "${TARGET_DATA_ROOT}/radarr" "${TARGET_DATA_ROOT}/sonarr" 2>/dev/null || true
 chown -R 1002:1002 "${TARGET_DATA_ROOT}/paperless_ngx/paperless_consume" "${TARGET_DATA_ROOT}/paperless_ngx/paperless_media" "${TARGET_DATA_ROOT}/paperless_ngx/paperless_data" "${TARGET_DATA_ROOT}/paperless_ngx/paperless_export" 2>/dev/null || true
 chown -R 999:999 "${TARGET_DATA_ROOT}/paperless_ngx/paperless_redis" 2>/dev/null || true
 # Docuseal image runs as 2000:2000; embedded Redis must write RDB under /data/docuseal.

@@ -29,6 +29,7 @@ Use object storage backups for:
 
 - database dumps captured before every snapshot
 - application file data through incremental encrypted snapshots
+- torrent automation app state under `/opt/homelab/data/transmission`, `/opt/homelab/data/prowlarr`, `/opt/homelab/data/radarr`, and `/opt/homelab/data/sonarr`
 - media and document uploads
 - a backup manifest
 
@@ -66,6 +67,13 @@ covered by dumps or are rebuildable:
 - `/opt/homelab/data/loki`
 - `/opt/homelab/data/portainer_data`
 - transient caches such as Jellyfin cache or Immich model cache
+
+This includes file-backed app state such as:
+
+- `/opt/homelab/data/transmission`
+- `/opt/homelab/data/prowlarr`
+- `/opt/homelab/data/radarr`
+- `/opt/homelab/data/sonarr`
 
 If the host uses filesystem-level snapshots, a stopped-service or
 crash-consistent snapshot can be kept as a secondary safety net. It should not
