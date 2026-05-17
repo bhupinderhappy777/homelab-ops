@@ -34,7 +34,7 @@ GitHub Actions CI only runs **static** checks (`terraform validate`, `ansible-pl
 | **GitHub** `releases` | `cloudflared` `.deb` downloaded from `https://github.com/cloudflare/cloudflared/releases/`. |
 | **Tailscale package repo** (`pkgs.tailscale.com`) | `tailscale` role adds apt repo and installs `tailscaled`. |
 | **restic** (`apt`, via `base_docker`) | OCI Object Storage backups and restores; talks to the S3-compatible API using env vars from `/etc/homelab/restic.env` (see `docker_backup_cron`). |
-| **Container registries** | Compose pulls images from **`docker.io`**, **`ghcr.io`**, and (for `torrent-client`) a **local** image build. Outbound HTTPS to registries must be allowed. |
+| **Container registries** | Compose pulls images from **`docker.io`**, **`ghcr.io`**, and **`lscr.io`**. Outbound HTTPS to registries must be allowed. |
 | **DNS + outbound HTTPS** | Image pulls, `apt`, `get_url`, Tailscale control plane, Cloudflare tunnel, OCI S3 API, optional Grafana.com dashboard downloads. |
 
 The VM does **not** need inbound app ports on the public Internet if you use **Cloudflare Tunnel** and/or **Tailscale**; NSG typically allows SSH from a restricted CIDR.

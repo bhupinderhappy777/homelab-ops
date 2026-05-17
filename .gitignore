@@ -49,3 +49,6 @@ logs/
 .env
 docker/.env
 secrets.yml
+
+# Generated app state that should not live in the repo
+docker/stacks/torrent-client/config/

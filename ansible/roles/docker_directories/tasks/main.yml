@@ -76,6 +76,10 @@
     - { path: "/opt/homelab/data/n8n_data", owner: "1000", group: "1000" }
     - { path: "/opt/homelab/data/openwebui_data" }
     - { path: "/opt/homelab/data/portainer_data" }
+    - { path: "/opt/homelab/data/transmission", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/prowlarr", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/radarr", owner: "1002", group: "1002" }
+    - { path: "/opt/homelab/data/sonarr", owner: "1002", group: "1002" }
     - { path: "/opt/homelab/data/immich/uploads" }
     - { path: "/opt/homelab/data/immich/immich_redis" }
     - { path: "/opt/homelab/data/immich/postgres" }
