@@ -9,6 +9,7 @@ services:
     networks:
     - homelab_network
     - firefly_iii
+    
     volumes:
     - /opt/homelab/data/firefly_iii/firefly_iii_upload:/var/www/html/storage/upload
     environment:

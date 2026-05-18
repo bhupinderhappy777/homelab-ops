@@ -26,7 +26,7 @@ services:
 
     volumes:
     - ${DATA_ROOT}/transmission:/config
-    - ${MEDIA_ROOT}:/downloads
+    - /home/adminuser/media:/downloads
 
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://localhost:9091/transmission/web/ >/dev/null']
@@ -125,7 +125,7 @@ services:
 
     volumes:
     - ${DATA_ROOT}/radarr:/config
-    - ${MEDIA_ROOT}:/downloads
+    - /home/adminuser/media:/downloads
 
     ports:
     - "7878:7878"
@@ -160,7 +160,7 @@ services:
 
     volumes:
     - ${DATA_ROOT}/sonarr:/config
-    - ${MEDIA_ROOT}:/downloads
+    - /home/adminuser/media:/downloads
 
     ports:
     - "8989:8989"
