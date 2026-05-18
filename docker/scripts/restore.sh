@@ -15,7 +15,7 @@ RESTORE_ROOT="${RESTORE_ROOT:-/tmp/homelab-restic-restore}"
 RESTORED_DATA_ROOT="${RESTORE_ROOT}/opt/homelab/data"
 RESTORED_DUMP_ROOT="${RESTORE_ROOT}/tmp/homelab-backup-payload/db-dumps"
 TARGET_DATA_ROOT="/opt/homelab/data"
-STACKS_ROOT="/opt/homelab/docker_stacks/docker/stacks"
+STACKS_ROOT="/opt/homelab/homelab_ops/docker/stacks"
 
 require_env() {
   local name="$1"
@@ -36,7 +36,7 @@ restart_compose_service() {
   local service="$2"
   (
     cd "${STACKS_ROOT}/${stack}"
-    "${COMPOSE_CMD[@]}" --env-file /opt/homelab/docker_stacks/docker/.env up -d "${service}"
+    "${COMPOSE_CMD[@]}" --env-file /opt/homelab/homelab_ops/docker/.env up -d "${service}"
   )
 }
 

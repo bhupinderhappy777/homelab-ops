@@ -35,7 +35,7 @@ Use the same SSH user as Terraform `admin_username`.
 
 Use the canonical steps in **[docs/README.md](../docs/README.md)** (Key Vault in `vault-rg`, `AZURE_KEY_VAULT_*` exports, `az keyvault secret set`, and non-secret defaults in [ansible/vars/homelab_public.yml](../ansible/vars/homelab_public.yml)).
 
-The deploy-time env file on the VM is rendered at `/opt/homelab/docker_stacks/docker/.env` from [ansible/roles/docker_stacks_deploy/templates/homelab.env.j2](../ansible/roles/docker_stacks_deploy/templates/homelab.env.j2).
+The deploy-time env file on the VM is rendered at `/opt/homelab/homelab_ops/docker/.env` from [ansible/roles/docker_stacks_deploy/templates/homelab.env.j2](../ansible/roles/docker_stacks_deploy/templates/homelab.env.j2).
 
 ## 4. Choose deployment mode
 
@@ -106,7 +106,7 @@ Make sure only the intended production host is running the production tunnel tok
 2. `security_hardening`: applies the baseline Linux hardening tasks.
 3. `base_docker`: installs Docker Engine (Compose plugin), `restic`, and S3-compatible CLI dependencies on Ubuntu/Debian.
 4. `docker_directories`: creates the exact bind-mount directories expected by the compose files under `/opt/homelab`.
-5. `docker_stacks_deploy`: clones this repo to `/opt/homelab/docker_stacks`, renders `/opt/homelab/docker/.env`, and deploys the compose stacks.
+5. `docker_stacks_deploy`: clones this repo to `/opt/homelab/homelab_ops`, renders `/opt/homelab/homelab_ops/docker/.env`, and deploys the compose stacks.
 6. `docker_backup_cron`: installs the OCI/restic backup and restore scripts, renders `/etc/homelab/restic.env`, and schedules nightly backups.
 7. `docker_backup_restore`: optionally restores from an OCI restic snapshot (`-e backup_restore_snapshot=...`).
 8. `cloudflared`: installs the Cloudflare Tunnel binary and starts the systemd service with the provided token.
@@ -161,7 +161,7 @@ Recommended process:
 2. Run a fresh manual backup:
 
 ```bash
-ssh <your-admin-user>@<your-vm-hostname-or-ip> "sudo /opt/homelab/docker_stacks/docker/scripts/backup.sh"
+ssh <your-admin-user>@<your-vm-hostname-or-ip> "sudo /opt/homelab/homelab_ops/docker/scripts/backup.sh"
 ```
 
 3. Change the pinned image tag or version reference in the relevant compose file.

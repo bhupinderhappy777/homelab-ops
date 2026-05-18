@@ -2,7 +2,7 @@
 # Non-secret defaults (safe to commit). Override via inventory group_vars or -e extra_vars.
 admin_username: bhupi
 docker_stacks_branch: main
-# Git URL for /opt/homelab/docker_stacks. SSH + agent forwarding: ansible.cfg has ForwardAgent=yes;
+# Git URL for /opt/homelab/homelab_ops. SSH + agent forwarding: ansible.cfg has ForwardAgent=yes;
 # run `ssh-add` on your laptop so the key that can read this repo is loaded before ansible-playbook.
 # For a public repo only, you can use https://github.com/USER/homelab-ops.git instead (no agent).
 docker_stacks_repo_url: git@github.com:bhupinderhappy777/homelab-ops.git

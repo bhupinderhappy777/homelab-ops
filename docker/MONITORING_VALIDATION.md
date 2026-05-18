@@ -23,7 +23,7 @@ Ensure `CONTAINER_SOCKET_PATH` in `docker/.env` points at the Docker socket (def
 ## Pre-deployment checklist
 
 - [ ] `/opt/homelab/data` and stack subdirectories exist with expected ownership after Ansible (`docker_directories` role)
-- [ ] External networks exist (couchdb, docuseal, firefly, immich, jellyfin, monica, n8n, paperless_*, pihole, portainer)
+- [ ] External shared network `homelab-network` exists
 - [ ] `.env` has `CONTAINER_SOCKET_PATH` set correctly for Docker
 - [ ] Prometheus and Grafana have sufficient disk for time-series retention (default 15 days)
 - [ ] Memory allocation is available (~3.7GB across containers)
@@ -77,14 +77,12 @@ curl -sS http://localhost:9090/api/v1/targets | jq '.data.activeTargets[] | sele
 
 ### External networks missing
 
-Symptom: `network xyz not found`.
+Symptom: `network homelab-network not found`.
 
-Fix: deploy application stacks first so Compose creates their networks, then monitoring:
+Fix: create the shared network or run the Ansible stack deploy role first:
 
 ```bash
-for stack in docuseal firefly immich jellyfin monica n8n paperless_ngx pihole portainer; do
-  docker compose -f docker/stacks/$stack/compose.yml up -d
-done
+docker network create homelab-network
 docker compose -f docker/stacks/monitoring/compose.yml up -d
 ```
 

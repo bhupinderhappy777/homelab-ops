@@ -90,8 +90,8 @@ Create the tunnel and routes in Cloudflare Zero Trust. Ansible installs `cloudfl
 ## 7. Backups and restore
 
 - Strategy and retention: [docker/BACKUP_STRATEGY.md](../docker/BACKUP_STRATEGY.md)
-- Scripts on the host (after deploy): `/opt/homelab/docker_stacks/docker/scripts/backup.sh`, `restore.sh`
-- Manual backup example: `sudo /opt/homelab/docker_stacks/docker/scripts/backup.sh`
+- Scripts on the host (after deploy): `/opt/homelab/homelab_ops/docker/scripts/backup.sh`, `restore.sh`
+- Manual backup example: `sudo /opt/homelab/homelab_ops/docker/scripts/backup.sh`
 
 ## Further reading
 

@@ -24,9 +24,9 @@
     mode: '0755'
   loop:
     - src: "{{ playbook_dir }}/../../docker/scripts/backup.sh"
-      dest: /opt/homelab/docker_stacks/docker/scripts/backup.sh
+      dest: /opt/homelab/homelab_ops/docker/scripts/backup.sh
     - src: "{{ playbook_dir }}/../../docker/scripts/restore.sh"
-      dest: /opt/homelab/docker_stacks/docker/scripts/restore.sh
+      dest: /opt/homelab/homelab_ops/docker/scripts/restore.sh
 
 - name: Create backup log file
   ansible.builtin.file:
@@ -41,7 +41,7 @@
     name: "homelab_backup"
     hour: "{{ homelab_backup_hour }}"
     minute: "{{ homelab_backup_minute }}"
-    job: "/opt/homelab/docker_stacks/docker/scripts/backup.sh >> /var/log/homelab_backup.log 2>&1"
+    job: "/opt/homelab/homelab_ops/docker/scripts/backup.sh >> /var/log/homelab_backup.log 2>&1"
     user: "root"
 
 - name: Configure logrotate for backup logs

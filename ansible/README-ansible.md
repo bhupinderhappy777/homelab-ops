@@ -8,7 +8,7 @@ Ansible is responsible for:
 - applying baseline hardening (`security_hardening`; Ubuntu / Debian family)
 - installing **Docker Engine** (Compose plugin), `restic`, and OCI backup helpers
 - creating `/opt/homelab` directories
-- rendering `/opt/homelab/docker_stacks/docker/.env` from Key Vault–backed facts
+- rendering `/opt/homelab/homelab_ops/docker/.env` from Key Vault–backed facts
 - installing and configuring `cloudflared`
 - deploying Compose stacks
 - configuring nightly OCI backup cron

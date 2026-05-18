@@ -16,8 +16,8 @@
 
 - name: Deploy {{ homelab_stack.name }} stack
   ansible.builtin.command:
-    cmd: "{{ homelab_compose_cmd }} --env-file /opt/homelab/docker_stacks/docker/.env up -d --remove-orphans"
-    chdir: "/opt/homelab/docker_stacks/docker/stacks/{{ homelab_stack.name }}"
+    cmd: "{{ homelab_compose_cmd }} --env-file /opt/homelab/homelab_ops/docker/.env up -d --remove-orphans"
+    chdir: "/opt/homelab/homelab_ops/docker/stacks/{{ homelab_stack.name }}"
   register: compose_output
   # Compose v2 often writes progress to stderr; include both streams so first deploy shows changed.
   changed_when: >-

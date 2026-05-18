@@ -2,7 +2,7 @@
 - name: Ensure restic restore script is installed on host
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../../docker/scripts/restore.sh"
-    dest: /opt/homelab/docker_stacks/docker/scripts/restore.sh
+    dest: /opt/homelab/homelab_ops/docker/scripts/restore.sh
     owner: root
     group: root
     mode: '0755'
@@ -10,12 +10,12 @@
 
 - name: Restore homelab data from OCI snapshot
   ansible.builtin.command:
-    cmd: /opt/homelab/docker_stacks/docker/scripts/restore.sh {{ backup_restore_snapshot }}
+    cmd: /opt/homelab/homelab_ops/docker/scripts/restore.sh {{ backup_restore_snapshot }}
   when: backup_restore_snapshot | length > 0
 
 - name: Restart stacks after OCI snapshot restore
   ansible.builtin.command:
-    cmd: docker compose --env-file /opt/homelab/docker_stacks/docker/.env up -d --remove-orphans
-    chdir: "/opt/homelab/docker_stacks/docker/stacks/{{ item }}"
+    cmd: docker compose --env-file /opt/homelab/homelab_ops/docker/.env up -d --remove-orphans
+    chdir: "/opt/homelab/homelab_ops/docker/stacks/{{ item }}"
   loop: "{{ backup_restore_stacks }}"
   when: backup_restore_snapshot | length > 0

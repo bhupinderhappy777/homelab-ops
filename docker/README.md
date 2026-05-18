@@ -6,7 +6,7 @@ Third-party services and network dependencies (registries, OCI, Cloudflare, etc.
 
 1. `stacks/` contains `compose.yml` for each self-hosted service.
 2. `scripts/` includes `backup.sh`, `restore.sh`, and `deploy.sh`.
-3. `.env.example` mirrors variables Ansible renders into `/opt/homelab/docker_stacks/docker/.env` during provisioning.
+3. `.env.example` mirrors variables Ansible renders into `/opt/homelab/homelab_ops/docker/.env` during provisioning.
 
 ## Ansible-managed deployments
 
@@ -26,6 +26,12 @@ uses authentik proxy auth, configure the authentik Docker integration to use
 ## Monitoring
 
 Grafana dashboards are **file-provisioned** from `stacks/monitoring/grafana/provisioning/dashboards/` (refresh IDs with `stacks/monitoring/download-dashboards.sh`, then commit). After deploy, smoke-test with [MONITORING_VALIDATION.md](MONITORING_VALIDATION.md).
+
+## Current stacks
+
+- `authentik`, `firefly`, `paperless_ngx`, and Grafana use the current SSO/proxy-auth flow.
+- `torrent-client` now includes Transmission, FlareSolverr, Prowlarr, Radarr, and Sonarr, with persistent state under `/opt/homelab/data/*` and shared downloads under `/home/<admin_username>/media`.
+- Media and utility stacks currently include `immich`, `jellyfin`, `openwebui`, `n8n`, `portainer`, `pihole`, `uptime-kuma`, `resume-matcher`, `docuseal`, `monica`, `couchdb`, `paperless_ai`, and `monitoring`.
 
 ## Adding a new service
 

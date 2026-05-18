@@ -10,7 +10,7 @@ This page lists **outside services, networks, and tooling** the repository and a
 | **Azure Key Vault** (recommended: resource group **`vault-rg`**) | Ansible `keyvault_secrets` | Secrets read at deploy time via **`az keyvault secret show`** on the **control machine** (`delegate_to: localhost`). Requires `az login` and RBAC on the vault (Get/List on secrets; Set when seeding). |
 | **Oracle Cloud Infrastructure (OCI)** | `restic` backups on the VM | S3-compatible **Object Storage** + customer-secret keys in Key Vault (`vault_oci_s3_*`). Backup scripts export `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_DEFAULT_REGION` because restic’s S3 backend expects those names; **no AWS CLI** is required. VM must reach your OCI region endpoint over outbound HTTPS. |
 
-Terraform in this repo **does not** create Key Vault; manage the vault separately (Portal, CLI, or your own IaC). See [README.md](README.md) and [docs/README.md](README.md).
+Terraform in this repo **does not** create Key Vault; manage the vault separately (Portal, CLI, or your own IaC). See [../README.md](../README.md) and [README.md](README.md).
 
 ## 2. Control machine (laptop or CI)
 
@@ -84,7 +84,7 @@ flowchart TB
   end
   subgraph vm [Ubuntu_VM]
     DK[Docker_registries]
-    REST[restic_AWS_CLI]
+    REST[restic_S3_backend]
   end
   TF --> RG
   AZ --> KV

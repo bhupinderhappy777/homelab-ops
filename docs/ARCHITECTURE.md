@@ -10,24 +10,25 @@ The automation and Compose bind mounts are written for **Ubuntu Server** with **
 |------|------|
 | `terraform/` | Azure resource group, VNet, subnet, NSG, public IP, NIC, Linux VM (Spot-capable). Key Vault is **not** defined here; use **`vault-rg`** (or equivalent) separately. See [DEPENDENCIES.md](DEPENDENCIES.md). |
 | `ansible/` | Playbooks, inventory, `vars/homelab_public.yml` (committed defaults), roles: Key Vault facts, **Ubuntu/Debian** OS hardening (`security_hardening`), Docker Engine, data dirs, stack deploy, backup cron, restore, tunnel, Tailscale. |
-| `docker/stacks/` | One directory per Compose project; cloned/checked out on the VM under `/opt/homelab/docker_stacks/docker/stacks/`. Monitoring includes Grafana dashboard JSON in git under `docker/stacks/monitoring/grafana/provisioning/dashboards/`. |
+| `docker/stacks/` | One directory per Compose project; checked out on the VM under `/opt/homelab/homelab_ops/docker/stacks/`. Monitoring includes Grafana dashboard JSON in git under `docker/stacks/monitoring/grafana/provisioning/dashboards/`. |
 | `docker/scripts/` | `backup.sh`, `restore.sh`, etc.; copied to the VM by Ansible. |
 
 ## Where things run
 
 - **Control machine:** `az login`, `ansible-playbook`, Key Vault reads (`delegate_to: localhost` in `keyvault_secrets`).
-- **VM:** `/opt/homelab/data` bind mounts, `/opt/homelab/docker_stacks` git checkout, rendered `/opt/homelab/docker_stacks/docker/.env`, systemd units (`cloudflared`, backups), container workloads.
+- **VM:** `/opt/homelab/data` bind mounts, `/opt/homelab/homelab_ops` git checkout, rendered `/opt/homelab/homelab_ops/docker/.env`, systemd units (`cloudflared`, backups), container workloads.
 
 ## Data and secrets flow
 
 1. Operator seeds **Azure Key Vault** (`vault-rg`).
 2. `deploy-homelab.yml` loads secrets into Ansible facts (`vault_*`).
-3. `docker_stacks_deploy` templates **`.env`** on the VM from those facts (not from committing `.env` to git).
+3. `docker_stacks_deploy` clones the repo to `/opt/homelab/homelab_ops` and templates `docker/.env` on the VM from those facts (not from committing `.env` to git).
 
 ## Networking (simplified)
 
 - NSG allows SSH from `var.ssh_allowed_cidr`.
 - Application access is typically via **Cloudflare Tunnel** (HTTPS to Cloudflare → tunnel → localhost ports on VM) and/or **Tailscale**.
+- Stacks join a shared external Docker bridge named `homelab-network`; stack-local networks remain where needed for internal service isolation.
 
 ## Design practices
 
