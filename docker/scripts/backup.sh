@@ -64,7 +64,8 @@ PY
 find_container() {
   local prefix="$1"
   local prefix_pattern="${prefix//_/[-_]}"
-  "${CONTAINER_CLI}" ps --format '{{.Names}}' | grep -E "^${prefix_pattern}([_-]|$)" | head -n1
+  # Match the prefix anywhere in the container name (handles compose project prefixes)
+  "${CONTAINER_CLI}" ps --format '{{.Names}}' | grep -E "${prefix_pattern}([_-]|$)" | head -n1
 }
 
 exec_in() {
@@ -75,7 +76,7 @@ exec_in() {
   name="$(find_container "${prefix}" || true)"
   if [[ -z "${name}" ]]; then
     echo "Container prefix not found: ${prefix}" >&2
-    exit 1
+    return 1
   fi
 
   "${CONTAINER_CLI}" exec "${name}" "$@"
@@ -100,7 +101,7 @@ exec_in "paperless_ngx-db" pg_dump -U paperless_user paperless_db > "${DB_DUMP_D
 exec_in "docuseal-postgres" pg_dump -U postgres docuseal > "${DB_DUMP_DIR}/docuseal_db.sql"
 exec_in "immich-database" pg_dump -U postgres immich > "${DB_DUMP_DIR}/immich_db.sql"
 exec_in "firefly-db" sh -lc 'mariadb-dump -ufirefly -p"$MYSQL_PASSWORD" firefly' > "${DB_DUMP_DIR}/firefly_db.sql"
-exec_in "monica-db" sh -lc 'mariadb-dump -umonica -p"$MYSQL_PASSWORD" monica' > "${DB_DUMP_DIR}/monica_db.sql"
+exec_in "monica-db" sh -lc 'if mariadb-dump -umonica -p"$MYSQL_PASSWORD" monica > /tmp/monica_db.sql 2>/tmp/monica_db.err; then cat /tmp/monica_db.sql; else mariadb-dump -uroot -p"$MYSQL_ROOT_PASSWORD" monica; fi' > "${DB_DUMP_DIR}/monica_db.sql"
 
 # Authentik PostgreSQL dump
 exec_in "authentik_postgresql" pg_dump -U authentik authentik > "${DB_DUMP_DIR}/authentik_db.sql" || true

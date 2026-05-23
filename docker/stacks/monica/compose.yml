@@ -11,8 +11,8 @@ services:
     - /opt/homelab/data/monica/db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: '${MONICA_DB_PASSWORD}'
-      MYSQL_DATABASE: 'monica'
-      MYSQL_USER: 'monica'
+      MYSQL_DATABASE: '${MONICA_DB_NAME:-monica}'
+      MYSQL_USER: '${MONICA_DB_USER:-monica}'
       MYSQL_PASSWORD: '${MONICA_DB_PASSWORD}'
     networks:
     - homelab_network
@@ -46,8 +46,8 @@ services:
       # Database configuration
       DB_HOST: 'db'
       DB_PORT: '3306'
-      DB_DATABASE: 'monica'
-      DB_USERNAME: 'monica'
+      DB_DATABASE: '${MONICA_DB_NAME:-monica}'
+      DB_USERNAME: '${MONICA_DB_USER:-monica}'
       DB_PASSWORD: '${MONICA_DB_PASSWORD}'
       # Mail configuration (optional - configure if you want email features)
       MAIL_MAILER: 'log'  # Options: smtp, sendmail, mailgun, etc.
